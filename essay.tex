@@ -5,17 +5,12 @@
 \usepackage{listings}
 \usepackage{amsmath}
 
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
-
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, matrix, 3d, calc}
 
 \title{Take Me One More: Efficient Clustering Compression using Inter-Frame Encoding}
 \author{Ignacio Brasca}
 \date{\today}
-
-\floatsep 0.5cm
-\textfloatsep 0.5cm
-\intextsep 0.5cm
-
+\setlength{\parskip}{1em}
 \begin{document}
 
 \maketitle
@@ -98,7 +93,7 @@ The two steps in the proposed architecture can be named as follows:
 \subsection{Dynamic Cluster Formation}
 The technique here described (Dynamic Cluster Formation) or from now on: DCF, is an step that continuously checks for changes in the input stream of images based on a initial timestamp. When a difference greater than a defined threshold is detected, the current cluster is considered complete, and a new cluster begins. This step ensures that similar images are grouped together, allowing for efficient inter-frame encoding.
 
-\begin{figure}[H]
+\begin{figure}[!hb]
     \centering
     \begin{tikzpicture}[
         scale=0.80, every node/.style={scale=0.75, transform shape},
@@ -124,6 +119,7 @@ The technique here described (Dynamic Cluster Formation) or from now on: DCF, is
 
     \end{tikzpicture}
     \caption{Dynamic Cluster Formation (DCF) Step Diagram}
+    \label{fig:figure1}
 \end{figure}
 
 The DCF step can be implemented using a variety of techniques, such as threshold-based clustering, k-means clustering, or hierarchical clustering. The choice of clustering technique depends on the specific requirements of the application and the nature of the input data. For images, we recommend the usage of a threshold-based clustering technique, where the difference between consecutive frames is compared against a user-defined threshold during a timeframe $t$.
@@ -131,13 +127,11 @@ The DCF step can be implemented using a variety of techniques, such as threshold
 The DCF step is essential for efficiently grouping similar images into clusters, which can then be processed using the technique described in the next section.
 
 \subsection{Memory Optimization and Inter-frame Matching}
-The $MOIM$ step aims to minimize redundant processing and memory usage. It matches differences between frames and avoids reprocessing frames with similar information. This optimization step is crucial for achieving high compression ratios and efficient processing.
+The $MOIM$ step aims to minimize redundant processing and memory usage. It matches differences between frames and avoids reprocessing frames with similar information. This optimization step is crucial for achieving high compression ratios and efficient processing. (View Figure \ref{fig:figure2})
 
-Ideally we proposed the utilization of a global difference matrix called $K_{global}$ where we track against a set of values used on the same matrix as it was a memory registry. This matrix will be used to compute the difference between frames and then evaluate if the difference threshold is small enough to be considered part of the same cluster.
+Proposed here is the utilization of a global difference matrix called $K_{global}$, where we track against a set of values used on the same matrix as if it were a memory registry. This matrix will be used to compute the difference between frames and then evaluate if the difference threshold is small enough to be considered part of the same cluster.
 
-Huffman coding and Discrete Cosine Transform (DCT) techniques can be applied to the differences between frames to achieve high compression ratios. This step also involves managing memory efficiently to minimize the computational overhead of processing differences. (see Annex \ref{appendix:a} for more information)
-
-In collaboration with the first step of this pipeline, $MOIM$ ensures that the encoding algorithm can achieve high compression ratios while maintaining image quality.
+Huffman coding and Discrete Cosine Transform (DCT) techniques can be applied to the differences between frames to achieve high compression ratios. This step also involves managing memory efficiently to minimize the computational overhead of processing differences (see Annex \ref{appendix:a} for more information). In collaboration with the first step of this pipeline, $MOIM$ ensures that the encoding algorithm can achieve high compression ratios while maintaining image quality.
 
 \begin{figure}[!hb]
     \centering
@@ -165,8 +159,8 @@ In collaboration with the first step of this pipeline, $MOIM$ ensures that the e
 
     \end{tikzpicture}
     \caption{Memory Optimization and Inter-frame Matching (MOIM) Step Diagram}
+    \label{fig:figure2}
 \end{figure}
-
 
 \section{Clustering Encoding}
 Applying the inter-frame encoding algorithm works by computing the difference between consecutive frames inside a cluster in a time sequence $t$. Let $K_{t}$ represent the $t$-th frame in the sequence, and $I_{t-1}$ represent the previous frame. The difference between $I_{t}$ and $I_{t-1}$ is computed as follows:
@@ -175,7 +169,56 @@ Applying the inter-frame encoding algorithm works by computing the difference be
 \]
 The difference $\Delta I_{t}$ is then stored using techinques expressed in the previous section along with any additional information required for reconstruction.
 
-The inter-frame encoding algorithm can be applied to a wide range of applications, including video compression, medical imaging, and remote sensing. By exploiting temporal redundancy between consecutive frames, inter-frame encoding can achieve high compression ratios while maintaining image quality.
+The inter-frame encoding algorithm can be applied to a wide range of applications, including video compression, medical imaging, and remote sensing. By exploiting temporal redundancy between consecutive frames, inter-frame encoding can achieve high compression ratios while maintaining image quality. As you can see in Figure \ref{fig:figure3} this process is repeated for the entire sequence of $K$ frames.
+
+\begin{figure}[!hb]
+    \centering
+    \begin{tikzpicture}[scale=.5,every node/.style={minimum size=0.5cm},on grid]
+        % Bottom layer (Layer 1)
+        \begin{scope}[
+            yshift=-166,every node/.append style={
+            yslant=0.5,xslant=-1},yslant=0.5,xslant=-1
+            ]
+            \draw[step=4mm, black] (0,0) grid (5,5);
+            \draw[black,very thick] (0,0) rectangle (5,5);
+            \fill[black] (0,1) rectangle (2,2); % bottom-left
+        \end{scope}
+        
+        % Middle layer (Layer 2)
+        \begin{scope}[
+            yshift=-83,every node/.append style={
+            yslant=0.5,xslant=-1},yslant=0.5,xslant=-1
+            ]
+            \fill[white,fill opacity=0.9] (0,0) rectangle (5,5);
+            \draw[step=4mm, black] (0,0) grid (5,5);
+            \draw[black,very thick] (0,0) rectangle (5,5);
+            \fill[black] (0,0) rectangle (1,1); % bottom-left
+            \fill[black] (0,1) rectangle (2,2); % bottom-left
+        \end{scope}
+
+        % Top layer (Layer 3)
+        \begin{scope}[
+            yshift=0,every node/.append style={
+            yslant=0.5,xslant=-1},yslant=0.5,xslant=-1
+            ]
+            \fill[white,fill opacity=0.9] (0,0) rectangle (5,5);
+            \draw[black,very thick] (0,0) rectangle (5,5);
+            \draw[step=4mm, black] (0,0) grid (5,5);
+            \fill[black] (0,0) rectangle (2,2); % bottom-left
+        \end{scope}
+
+        % Labeling
+        \draw[-latex,thick,red!70!black](-3,5)node[left]{Inception frame}
+            to[out=0,in=90] (0,2.2);
+
+        \draw[thick,red](5.5,2.5)node[right]{$K_{n}$};
+        \draw[thick,red](5.5,-0.5)node[right]{$K_{n-1}$};
+        \draw[thick,red](5.5,-3.5)node[right]{$K_{n-2}$};
+
+    \end{tikzpicture}
+    \caption{Inter-frame Encoding Diagram}
+    \label{fig:figure3}
+\end{figure}
 
 \section{Performance Metrics}
 Performance rely on the reduction of redundancy and the minimization of memory usage. The following metrics can be used to evaluate the performance of the encoding algorithm:
@@ -203,12 +246,13 @@ The following diagram illustrates the proposed workflow for inter-frame encoding
 \begin{figure}[H]
     \centering
     \begin{tikzpicture}[
+        scale=0.80, every node/.style={scale=1, transform shape},
         font=\sffamily,
         >={Latex[width=2mm,length=2mm]},
         base/.style={draw, thick, align=center, minimum height=2em, minimum width=3em, fill=blue!20},
         process/.style={base, rectangle, rounded corners},
         data/.style={base, ellipse, fill=red!20},
-        arrow/.style={->, thick, color=blue!60}
+        arrow/.style={->, thick, color=blue!60},
     ]
 
     % Nodes
@@ -226,6 +270,8 @@ The following diagram illustrates the proposed workflow for inter-frame encoding
     \draw[arrow] (repeat.west) -- ++(-2,0) |- (iterate.west);
 
     \end{tikzpicture}
+    \caption{Proposed Workflow for Inter-frame Encoding}
+    \label{fig:figure4}
 \end{figure}
 
 
@@ -313,7 +359,5 @@ This encoded sequence is significantly shorter than the original representation,
 
 \subsection{Conclusion}
 Incorporating Huffman coding into the MOIM step allows for a significant reduction in data size by efficiently encoding frame differences. This process not only saves storage space but also accelerates data processing and retrieval, making it a valuable technique for optimizing inter-frame matching and memory usage in video and image compression systems.
-
-
 
 \end{document}
