@@ -68,7 +68,7 @@ Operations available at the $beam$ level are placed uttermost in the front of an
 
 In case multiple beams $x_{i,j}$ would be intertwined, we can define a net set of operations to establish what or which part of the frames we want to modify during which amount of time.
 
-\subsection{Inception}
+\subsection{Inception frame}
 Currently, compression against a set of frames is being computed against a linear relationship where $K$ frames are only compressed after $N$ times during a $t$ span. Presented here is the utilization of a global difference matrix called $K_{global}$ where we track against a set of values used on the same matrix as it was a memory registry.
 
 Starting from frame $n$, we can compute and utilize the same amount of $beams_{n,m}$ already stored from the initial inception frame. 
@@ -77,7 +77,7 @@ From an $inception$ frame, we should always compute the difference against the s
 
 Operations $\circ$ can be computed at runtime, against a set of $beams_{n,m}$ where $n,m$ are the dimensions restrictions of the matrix containing all the beams available in the source of information presented as a frame in $K$. This information is beneficial in order to calculate not only the difference between frames but also to compute inception frame to obtain the same set of frames in a different time span $t$.
 
-\subsection{Reverting}
+\subsection{Reverting frames}
 In order to revert an operation $\circ$, we can simply apply the inverse operation $\circ^{-1}$ to the frame $X_{k}$ and obtain the original frame $X_{n}$ or $X_{m}$. This operation is only possible if the original frame $X_{n}$ or $X_{m}$ is available in the set of frames $K$.
 
 \section{Architecture}
