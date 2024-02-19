@@ -4,8 +4,20 @@
 \usepackage{float}
 \usepackage{listings}
 \usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref} % For hyperlinks
 
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, matrix, 3d, calc}
+
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.3}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=darkblue,
+    filecolor=darkblue,      
+    urlcolor=darkblue,
+    citecolor=darkblue,
+}
 
 \title{Take Me One More: Efficient Clustering Compression using Inter-Frame Encoding}
 \author{Ignacio Brasca}
@@ -276,16 +288,16 @@ The following diagram illustrates the proposed workflow for inter-frame encoding
 
 
 \section{Implementation Details}
-Implementing inter-frame encoding requires careful consideration of several factors, including file formats, compression techniques, and computational complexity. Various file formats, such as JSON or binary formats, can be used to store image data and metadata efficiently. Additionally, compression techniques, such as run-length encoding or delta encoding, can further reduce storage requirements. It is essential to balance compression ratios with computational overhead to achieve optimal performance.
+Implementing inter-frame encoding requires careful consideration of several factors, including file formats, compression techniques, and computational complexity. Various file formats, such as JSON or binary formats, can be used to store image data and metadata efficiently. Additionally, compression techniques, such as run-length encoding or delta encoding, can further reduce storage requirements. It is essential to balance compression ratios with computational overhead to achieve optimal performance. Implementation details like metadata formats and compression techniques can be tailored to the specific requirements of the application although here we recommend a single JSON file format to store the differences between frames and metadata required for reconstruction.
 
 % TOOD: Implement benchmarks + application of the algorithm in a real-world scenario.
 % TODO: Explain offset application to avoid saving the same information over and over again.
 
 \section{Case Studies}
-inter-frame encoding has been widely used in video compression standards such as MPEG and H.264. These standards leverage inter-frame encoding to achieve significant reductions in file size while maintaining high-quality video playback. Additionally, inter-frame encoding has applications in medical imaging, surveillance systems, and remote sensing, where storage efficiency is critical.
+Encoding here presented has been widely used in video compression standards such as MPEG and H.264 in the past, although here presented we recommend the applicatiion of the same technique to a cluster. These standards leverage inter-frame encoding to achieve significant reductions in storage size as a whole while maintaining high-quality images without being affected. Additionally, encoding could have applications in medical imaging, surveillance systems, and remote sensing, where storage efficiency is critical and images contain significant temporal redundancy.
 
 \section{Conclusion}
-In conclusion, inter-frame encoding offers a powerful solution for compressing sequences of similar images efficiently. By exploiting temporal redundancy between consecutive frames, inter-frame encoding can achieve high compression ratios without sacrificing image quality. The algorithm's versatility and effectiveness make it an essential tool in various applications, from multimedia compression to medical imaging.
+In conclusion, inter-frame coding offers a powerful solution for compressing similar image sequences efficiently since its first appearance. However, this technique has always been applied to video coding. By exploiting the temporal redundancy between consecutive frames, the proposed algorithm can achieve high compression ratios while maintaining the image quality individually. The dynamic group formation step ensures that similar images are grouped together, which enables efficient inter-frame coding. The memory optimization and inter-frame matching step minimizes redundant processing and memory usage, further improving the efficiency of the compression algorithm. The proposed algorithm has the potential to significantly reduce the storage requirements of fast capture devices, making it a valuable tool for a wide range of applications that rely on the uniformity of similar images presented in a time series.
 
 \section{References}
 \begin{enumerate}
