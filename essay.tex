@@ -1,11 +1,26 @@
-\documentclass[twocolumn]{article}
-\usepackage{graphicx}
-\usepackage{tikz}
-\usepackage{float}
-\usepackage{listings}
-\usepackage{amsmath}
-
+\documentclass[10pt, twocolumn]{article}
+\usepackage[utf8]{inputenc} % Ensure encoding is set to UTF-8 for compatibility
+\usepackage{graphicx} % For including images
+\usepackage{amsmath} % For advanced math formatting
+\usepackage{hyperref} % For hyperlinks
+\usepackage{float} % For precise placement of figures
+\usepackage{listings} % For code listings
+\usepackage{tikz} % For drawing diagrams
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, matrix, 3d, calc}
+
+% Ensure figures and tables are properly numbered and that hyperlinks are colored black for printing and readability
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0, 0.0, 0.3}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=darkblue,
+    filecolor=darkblue,      
+    urlcolor=darkblue,
+    citecolor=darkblue,
+}
+
+% Adjust margins to meet arXiv requirements
+\usepackage[margin=1in]{geometry}
 
 \title{Take Me One More: Efficient Clustering Compression using Inter-Frame Encoding}
 \author{Ignacio Brasca}
@@ -296,9 +311,9 @@ In conclusion, inter-frame encoding offers a powerful solution for compressing s
     \item T. Koga, Y. Iijima, K. Iinuma, T. Ishiguro, "Statistical Performance Analysis of an Interframe Encoder for Broadcast Television Signals," 1981.
     \item H. Ban Choi, A. A. Trofimov, "Fast Test Zone Search Algorithm for Interframe Encoding," 2017.
     \item B. Girod, A. Aaron, S. Rane, D. Rebollo-Monedero, "Distributed Video Coding," 2005.
-    \item E. Belyaev, "An Efficient Compressive Sensed Video Codec with Inter-Frame Decoding and Low-Complexity Intra-Frame Encoding," Sensors 2023, 23(3), 1368; https://doi.org/10.3390/s23031368, January 2023.
-    \item D. Huffman, "A Method for the Construction of Minimum-Redundancy Codes," Proceedings of the IRE, vol. 40, no. 9, pp. 1098–1101, 1952, doi:10.1109/JRPROC.1952.273898.
-    \item J. Van Leeuwen, "On the construction of Huffman trees," in Proceedings of the 3rd Colloquium on Automata, Languages, and Programming (ICALP), pp. 382–410, 1976, Retrieved 2014-02-20.
+    \item E. Belyaev, "An Efficient Compressive Sensed Video Codec with Inter-Frame Decoding and Low-Complexity Intra-Frame Encoding," 2023.
+    \item D. Huffman, "A Method for the Construction of Minimum-Redundancy Codes," Proceedings of the IRE, vol. 40, no. 9, pp. 1098–1101, 1952.
+    \item J. Van Leeuwen, "On the construction of Huffman trees," in Proceedings of the 3rd Colloquium on Automata, Languages, and Programming (ICALP), pp. 382–410, 1976.
 \end{enumerate}
 
 \clearpage
