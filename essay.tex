@@ -176,11 +176,11 @@ Huffman coding and Discrete Cosine Transform (DCT) techniques can be applied to 
 \end{figure}
 
 \section{Clustering Encoding}
-Applying the inter-frame encoding algorithm works by computing the difference between consecutive frames inside a cluster in a time sequence $t$. Let $K_{t}$ represent the $t$-th frame in the sequence, and $I_{t-1}$ represent the previous frame. The difference between $I_{t}$ and $I_{t-1}$ is computed as follows:
+Applying the inter-frame encoding algorithm works by computing the difference between consecutive frames inside a cluster in a time sequence $t$. Let $K_{t}$ represent the $t$-th frame in the sequence, and $K_{t-1}$ represent the previous frame. The difference between $K_{t}$ and $K_{t-1}$ is computed as follows:
 \[
-\Delta I_{t} = I_{t} - I_{t-1}
+\Delta K_{t} = K_{t} - K_{t-1}
 \]
-The difference $\Delta I_{t}$ is then stored using techinques expressed in the previous section along with any additional information required for reconstruction.
+The difference $\Delta K_{t}$ is then stored using techinques expressed in the previous section along with any additional information required for reconstruction.
 
 The inter-frame encoding algorithm can be applied to a wide range of applications, including video compression \cite{belyaev2023efficient} \cite{girod2005distributed} \cite{koga1981statistical}, medical imaging, and remote sensing. By exploiting temporal redundancy between consecutive frames, inter-frame encoding can achieve high compression ratios while maintaining image quality. As you can see in Figure \ref{fig:figure3} this process is repeated for the entire sequence of $K$ frames.
 
@@ -287,8 +287,47 @@ The following diagram illustrates the proposed workflow for inter-frame encoding
     \label{fig:figure4}
 \end{figure}
 
+\section{Implementation}
+This section outlines the implementation of the proposed algorithm, focusing on the pseudo-algorithm for the theoretical approach.
 
-\section{Implementation Details}
+\subsection{Pseudo-Algorithm}
+The pseudo-algorithm describes the process of compressing and decompressing image frames using inter-frame encoding based on a temporal redundancy, leveraging Huffman coding and DCT techniques to improve singular compression ratios at image level and relying on techniques described DCF and MOIF, which work at storage level. The process is presented in mathematical terms to illustrate the relationship with the theory described in this document.
+
+\begin{enumerate}
+    \item \textbf{Initialization:}
+    \begin{itemize}
+        \item Set the inception frame $I_0$ as the reference frame.
+        \item Initialize an empty set $S$ for storing compressed frame differences.
+    \end{itemize}
+
+    \item \textbf{Forming $K$ using $DCF$ (Dynamic Cluster Formation):}
+    \begin{enumerate}
+        \item Continuously form $K$ clusters based on the difference threshold from a set of frames.
+        \item Store clusters generated as part of a set $K$.
+        \item Set the first frame $K_0$ as the reference frame (also known as the inception frame $I_0$)
+        \item Implement $MOIM$ step to minimize redundant processing and memory usage (See \ref{appendix:a}).
+    \end{enumerate}
+
+    \item \textbf{For each frame $K_n$ inside $K$:}
+    \begin{enumerate}
+        \item Compute the difference $\Delta K_{n} = K_{n} - K_{n-1}$.
+        \item Apply DCT to $\Delta K_{n}$ to obtain frequency components $F_{n}$.
+        \item Encode $F_{n}$ using Huffman coding to produce a compressed representation $C_{n}$.
+        \item Add $C_{n}$ to the set $S$.
+    \end{enumerate}
+
+    \item \textbf{Decompression:}
+    \begin{enumerate}
+        \item Apply difference stored after $MOIM$ To obtain the difference between frames.
+        \item From frames obtained after $MOIM$, apply Huffman decoding to obtain $F_{n}$.
+        \item Apply the inverse DCT to $F_{n}$ to obtain $\Delta K_{n}$.
+        \item Reconstruct frame $I_n = \Delta I_{n} + I_{n-1}$.
+    \end{enumerate}
+\end{enumerate}
+
+This section provides a framework for the practical application of the proposed algorithm, detailing the steps required to read, extract, and apply differences between frames based on metadata, thus illustrating the algorithm's in a real-world scenario.
+
+\subsection{Implementation Details}
 Implementing inter-frame encoding requires careful consideration of several factors, including file formats, compression techniques, and computational complexity. Various file formats, such as JSON or binary formats, can be used to store image data and metadata efficiently. Additionally, compression techniques, such as run-length encoding or delta encoding, can further reduce storage requirements. It is essential to balance compression ratios with computational overhead to achieve optimal performance. Implementation details like metadata formats and compression techniques can be tailored to the specific requirements of the application although here we recommend a single JSON file format to store the differences between frames and metadata required for reconstruction.
 
 \section{Case Studies}
@@ -303,7 +342,7 @@ In conclusion, inter-frame coding offers a powerful solution for compressing sim
 \clearpage
 \newpage
 \appendix
-\section{Annex A: Utilizing Huffman Coding in MOIM for Efficient Data Compression}
+\section{Annex A: Utilizing Huffman Coding in MOIM}
 \label{appendix:a}
 \subsection{Introduction}
 Huffman coding \cite{huffman1952method}, a popular method for lossless data compression, can significantly enhance the MOIM step by reducing the amount of data required to represent frame differences. This section explains the process and provides a practical example of its application.
