@@ -19,6 +19,7 @@
     citecolor=darkblue,
 }
 
+
 \title{Take Me One More: Efficient Clustering Compression using Inter-Frame Encoding}
 \author{Ignacio Brasca}
 \date{\today}
@@ -37,9 +38,9 @@
 \section{Introduction}
 In recent times, there has been a surge in the need for efficient data compression techniques due to the rapid expansion of quick-capture devices like CCTV cameras, smartphones, and other portable storage-constrained devices. In response to this challenge, there's formulated in this essay a potential concept for an intraframe data encoding compression algorithm that allows reduction of storage requirements. This proposed algorithm leverages the power of Huffman coding and Discrete Cosine Transform (DCT) techniques, which are highly effective in minimizing the size of data files.
 
-Using Huffman coding as a form of entropy encoding technique that replaces a sequence of symbols with shorter codes based on their probability distribution we can save storage in benefit of redundancy. In contrast, DCT is a mathematical process that decomposes an image into a series of frequency components and helps reduce the redundancy as well, in pictures as well as video frames (pictures in a time-series). Combining these two powerful techniques, the proposed algorithm can offer significant storage savings for quick-capture devices.
+Using Huffman coding as a form of entropy encoding technique that replaces a sequence of symbols with shorter codes based on their probability distribution we can save storage in benefit of redundancy \cite{van1976construction}. In contrast, DCT is a mathematical process \cite{narasimha1978computation} that decomposes an image into a series of frequency components and helps reduce the redundancy as well, in pictures as well as video frames (pictures in a time-series). Combining these two powerful techniques, the proposed algorithm can offer significant storage savings for quick-capture devices.
 
-The method here proposed allow us to understand not only one picture as a whole but an ecosystem of similar pictures based on a timestamp technique. Enabling us the categorization based a on threshold generated after a difference threshold computed using the inception frame. This technique has been in used in the past for video compression, but not for single images. This essay will provide an overview of the inter-frame encoding algorithm, its workflow, implementation details, and case studies to demonstrate its effectiveness.
+The method here proposed allow us to understand not only one picture as a whole but an ecosystem of similar pictures \cite{lee2002compressing} based on a timestamp technique. Enabling us the categorization based a on threshold generated after a difference threshold computed using the inception frame. This technique has been in used in the past for video compression \cite{wang2012memory}, but not for single images. This essay will provide an overview of the inter-frame encoding algorithm, its workflow, implementation details, and case studies to demonstrate its effectiveness.
 
 \section{Background}
 Traditional image compression techniques, such as JPEG and PNG, rely on compressing individual frames independently. While these methods are effective for compressing individual images, they may not be optimal for sequences of similar images when those are being captured by real-time devices or smart phones. inter-frame encoding help us to overpass this limitation by exploiting the temporal redundancy between consecutive frames in a sequence. By storing only the differences between frames, inter-frame encoding can achieve higher compression ratios while preserving image quality.
@@ -181,7 +182,7 @@ Applying the inter-frame encoding algorithm works by computing the difference be
 \]
 The difference $\Delta I_{t}$ is then stored using techinques expressed in the previous section along with any additional information required for reconstruction.
 
-The inter-frame encoding algorithm can be applied to a wide range of applications, including video compression, medical imaging, and remote sensing. By exploiting temporal redundancy between consecutive frames, inter-frame encoding can achieve high compression ratios while maintaining image quality. As you can see in Figure \ref{fig:figure3} this process is repeated for the entire sequence of $K$ frames.
+The inter-frame encoding algorithm can be applied to a wide range of applications, including video compression \cite{belyaev2023efficient} \cite{girod2005distributed} \cite{koga1981statistical}, medical imaging, and remote sensing. By exploiting temporal redundancy between consecutive frames, inter-frame encoding can achieve high compression ratios while maintaining image quality. As you can see in Figure \ref{fig:figure3} this process is repeated for the entire sequence of $K$ frames.
 
 \begin{figure}[!hb]
     \centering
@@ -290,28 +291,14 @@ The following diagram illustrates the proposed workflow for inter-frame encoding
 \section{Implementation Details}
 Implementing inter-frame encoding requires careful consideration of several factors, including file formats, compression techniques, and computational complexity. Various file formats, such as JSON or binary formats, can be used to store image data and metadata efficiently. Additionally, compression techniques, such as run-length encoding or delta encoding, can further reduce storage requirements. It is essential to balance compression ratios with computational overhead to achieve optimal performance. Implementation details like metadata formats and compression techniques can be tailored to the specific requirements of the application although here we recommend a single JSON file format to store the differences between frames and metadata required for reconstruction.
 
-% TOOD: Implement benchmarks + application of the algorithm in a real-world scenario.
-% TODO: Explain offset application to avoid saving the same information over and over again.
-
 \section{Case Studies}
-Encoding here presented has been widely used in video compression standards such as MPEG and H.264 in the past, although here presented we recommend the applicatiion of the same technique to a cluster. These standards leverage inter-frame encoding to achieve significant reductions in storage size as a whole while maintaining high-quality images without being affected. Additionally, encoding could have applications in medical imaging, surveillance systems, and remote sensing, where storage efficiency is critical and images contain significant temporal redundancy.
+Encoding here presented has been widely used in video compression standards such as MPEG and H.264 \cite{wiegand2003overview} in the past, although here presented we recommend the applicatiion of the same technique to a cluster. These standards leverage inter-frame encoding to achieve significant reductions in storage size as a whole while maintaining high-quality images without being affected. Additionally, encoding could have applications in medical imaging, surveillance systems, and remote sensing, where storage efficiency is critical and images contain significant temporal redundancy.
 
 \section{Conclusion}
 In conclusion, inter-frame coding offers a powerful solution for compressing similar image sequences efficiently since its first appearance. However, this technique has always been applied to video coding. By exploiting the temporal redundancy between consecutive frames, the proposed algorithm can achieve high compression ratios while maintaining the image quality individually. The dynamic group formation step ensures that similar images are grouped together, which enables efficient inter-frame coding. The memory optimization and inter-frame matching step minimizes redundant processing and memory usage, further improving the efficiency of the compression algorithm. The proposed algorithm has the potential to significantly reduce the storage requirements of fast capture devices, making it a valuable tool for a wide range of applications that rely on the uniformity of similar images presented in a time series.
 
-\section{References}
-\begin{enumerate}
-    \item Z. Wang, D. Chanda, S. Simon, "Memory Efficient Lossless Compression of Image Sequences with JPEG-LS and Temporal Prediction."
-    \item J.-D. Lee, S.-Y. Wan, C.-M. Ma, R.-F. Wu, "Compressing Sets of Similar Images Using Hybrid Compression Model."
-    \item S. Ait-Aoudia, A. Gabis, A. Naimi, "Compressing Sets of Similar Images."
-    \item T. Wiegand, G. J. Sullivan, G. Bjøntegaard, A. Luthra, "Overview of the H.264/AVC Video Coding Standard," IEEE Transactions on Circuits and Systems for Video Technology, vol. 13, no. 7, July 2003.
-    \item T. Koga, Y. Iijima, K. Iinuma, T. Ishiguro, "Statistical Performance Analysis of an Interframe Encoder for Broadcast Television Signals," 1981.
-    \item H. Ban Choi, A. A. Trofimov, "Fast Test Zone Search Algorithm for Interframe Encoding," 2017.
-    \item B. Girod, A. Aaron, S. Rane, D. Rebollo-Monedero, "Distributed Video Coding," 2005.
-    \item E. Belyaev, "An Efficient Compressive Sensed Video Codec with Inter-Frame Decoding and Low-Complexity Intra-Frame Encoding," Sensors 2023, 23(3), 1368; https://doi.org/10.3390/s23031368, January 2023.
-    \item D. Huffman, "A Method for the Construction of Minimum-Redundancy Codes," Proceedings of the IRE, vol. 40, no. 9, pp. 1098–1101, 1952, doi:10.1109/JRPROC.1952.273898.
-    \item J. Van Leeuwen, "On the construction of Huffman trees," in Proceedings of the 3rd Colloquium on Automata, Languages, and Programming (ICALP), pp. 382–410, 1976, Retrieved 2014-02-20.
-\end{enumerate}
+\bibliographystyle{acm}
+\bibliography{references}
 
 \clearpage
 \newpage
@@ -319,7 +306,7 @@ In conclusion, inter-frame coding offers a powerful solution for compressing sim
 \section{Annex A: Utilizing Huffman Coding in MOIM for Efficient Data Compression}
 \label{appendix:a}
 \subsection{Introduction}
-Huffman coding, a popular method for lossless data compression, can significantly enhance the MOIM step by reducing the amount of data required to represent frame differences. This section explains the process and provides a practical example of its application.
+Huffman coding \cite{huffman1952method}, a popular method for lossless data compression, can significantly enhance the MOIM step by reducing the amount of data required to represent frame differences. This section explains the process and provides a practical example of its application.
 
 \subsection{Huffman Coding in MOIM}
 The MOIM step, crucial for minimizing redundant data and optimizing memory usage, can benefit from Huffman coding by encoding the frame differences more compactly. Huffman coding achieves this by assigning variable-length codes to input characters, with shorter codes for more frequent characters. 
