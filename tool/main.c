@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 // program information
 #define PROGRAM_NAME "Inter-frame Supervisor"
@@ -76,6 +77,46 @@ void head_information() {
 }
 
 /**
+* @brief This function gets the parent directory of a path
+*
+* This function is in charge of getting the parent directory of a path
+* and returning it as a string.
+*
+* @param path The path to get the parent directory from
+* @return char* The parent directory
+*/
+char *get_parent_dir(char *path) {
+    char *cwd = malloc(1024);
+    getcwd(cwd, 1024);
+    return cwd;
+}
+
+/**
+* @brief This function process the content of a path
+*
+* This function is in charge of processing the content of a path
+* and manipulate the bytes of the file.
+*
+* @param path The path of the file to process
+* @return void
+*/
+void process_file(char *path) {
+    FILE *file = fopen(path, "r");
+
+    if(file == NULL) {
+        throw_error("Could not open file. Aborting operation. \n");
+    }
+
+    // read the file
+    char buffer[1024];
+    while(fgets(buffer, sizeof(buffer), file) != NULL) {
+        printf("%s", buffer);
+    }
+
+    fclose(file);
+}
+
+/**
 * @brief This function reads a directory
 *
 * This function is in charge of reading a directory and printing
@@ -138,6 +179,9 @@ FilesContainer read_dir(char *path) {
         throw_error("Could not open directory. Aborting operation. \n");
     }
 
+    // get current working directory + path to the directory being read
+    files_array.parent_dir = get_parent_dir(path);
+
     return files_array;
 }
 
@@ -181,8 +225,9 @@ char *cast_file_type(unsigned char type) {
 * @return void
 */
 void supervisor(char *path) {
-    printf("Listening to directory: %s\n", path);
     FilesContainer files = read_dir(path);
+
+    printf("Files found in the directory [%s]: \n", files.parent_dir);
 
     for(int i = 0; i < files.total_nodes; i++) {
         char *file_type = cast_file_type(files.files[i].type);
