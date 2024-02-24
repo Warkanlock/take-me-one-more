@@ -1,0 +1,68 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{van1976construction}
+\citation{narasimha1978computation}
+\citation{lee2002compressing}
+\citation{wang2012memory}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Formal Definitions}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Sequence Compression Against a Set of Frames}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Restrictions}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Inception frame}{3}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Reverting frames}{3}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Architecture}{3}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Dynamic Cluster Formation}{3}{subsection.3.1}\protected@file@percent }
+\citation{belyaev2023efficient}
+\citation{girod2005distributed}
+\citation{koga1981statistical}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Dynamic Cluster Formation (DCF) Step Diagram}}{4}{figure.1}\protected@file@percent }
+\newlabel{fig:figure1}{{1}{4}{Dynamic Cluster Formation (DCF) Step Diagram}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Memory Optimization and Inter-frame Matching}{4}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Memory Optimization and Inter-frame Matching (MOIM) Step Diagram}}{4}{figure.2}\protected@file@percent }
+\newlabel{fig:figure2}{{2}{4}{Memory Optimization and Inter-frame Matching (MOIM) Step Diagram}{figure.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Clustering Encoding}{4}{section.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Inter-frame Encoding Diagram}}{5}{figure.3}\protected@file@percent }
+\newlabel{fig:figure3}{{3}{5}{Inter-frame Encoding Diagram}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Performance Metrics}{5}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Proposed Workflow}{5}{section.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Proposed Workflow for Inter-frame Encoding}}{5}{figure.4}\protected@file@percent }
+\newlabel{fig:figure4}{{4}{5}{Proposed Workflow for Inter-frame Encoding}{figure.4}{}}
+\citation{wiegand2003overview}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Implementation}{6}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Pseudo-Algorithm}{6}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Implementation Details}{6}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Case Studies}{6}{section.8}\protected@file@percent }
+\bibstyle{acm}
+\bibdata{references}
+\bibcite{belyaev2023efficient}{1}
+\bibcite{girod2005distributed}{2}
+\bibcite{huffman1952method}{3}
+\bibcite{koga1981statistical}{4}
+\bibcite{lee2002compressing}{5}
+\bibcite{narasimha1978computation}{6}
+\bibcite{van1976construction}{7}
+\bibcite{wang2012memory}{8}
+\bibcite{wiegand2003overview}{9}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{7}{section.9}\protected@file@percent }
+\citation{huffman1952method}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Annex A: Utilizing Huffman Coding in MOIM}{8}{appendix.A}\protected@file@percent }
+\newlabel{appendix:a}{{A}{8}{Annex A: Utilizing Huffman Coding in MOIM}{appendix.A}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Introduction}{8}{subsection.A.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}Huffman Coding in MOIM}{8}{subsection.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {A.2.1}Example}{8}{subsubsection.A.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}Conclusion}{8}{subsection.A.3}\protected@file@percent }
+\gdef \@abspage@last{8}
