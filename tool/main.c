@@ -1,3 +1,4 @@
+#include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -9,9 +10,27 @@
 #define AUTHOR_NAME "Ignacio Brasca"
 #define VERSION 1
 
+// useful global constants
+#define N_FILES 100
+
 // useful macros
 #define PARENT_DIR ".."
 #define CURRENT_DIR "."
+
+/**
+* @brief This struct represents a file
+*/
+typedef struct {
+    char *name;
+    char *path;
+    unsigned char type;
+} File;
+
+typedef struct {
+    File *files;
+    unsigned int total_nodes;
+    char* parent_dir;
+} FilesContainer;
 
 /**
 * @brief This function handles internal errors
@@ -65,9 +84,14 @@ void head_information() {
 * @param path The path of the directory to read
 * @return void
 */
-void read_dir(char *path) {
+FilesContainer read_dir(char *path) {
     DIR *dir;
     struct dirent *ent;
+    FilesContainer files_array;
+
+    // define array to store files found in the directory
+    files_array.total_nodes = 0;
+    files_array.files = malloc(sizeof(File) * N_FILES);
 
     if(path == NULL) {
         throw_error("No path was provided. Aborting operation. \n");
@@ -76,26 +100,74 @@ void read_dir(char *path) {
     // open the directory and scan
     if ((dir = opendir (path)) != NULL) {
         while ((ent = readdir (dir)) != NULL) {
+            // create a temporal path to store the full path of the file
+            char temporal_path[1024];
 
             // avoid "." and ".." directories (current and parent directories)
             if (strcmp(ent->d_name, CURRENT_DIR) == 0 || strcmp(ent->d_name, PARENT_DIR) == 0) {
                 continue;
             }
 
-            // check if it's a directory or a file
-            if (ent->d_type == DT_DIR) {
-                printf("Directory: ");
-            } else {
-                printf("File: ");
+            // create a File object with full path
+            File file;
+            file.name   = ent->d_name;
+            snprintf(temporal_path, sizeof(temporal_path), "%s/%s", path, ent->d_name);
+            file.path = strdup(temporal_path);
+            file.type   = ent->d_type;
+
+            // add the file to the array
+            if(files_array.total_nodes >= N_FILES) {
+                // TODO: handle this case properly extending the capacity of the array
+                throw_error("The number of files in the directory exceeds the limit. Aborting operation. \n");
             }
 
-            printf("%s\n", ent->d_name);
+            // if it's a directory, read it recursively
+            if(file.type == DT_DIR) {
+                FilesContainer files = read_dir(file.path);
+
+                for(int i = 0; i < files.total_nodes; i++, files_array.total_nodes++) {
+                    files_array.files[files_array.total_nodes] = files.files[i];
+                }
+            } else {
+                files_array.files[files_array.total_nodes++] = file;
+            }
         }
 
         closedir (dir);
     } else {
-        // could not open directory
         throw_error("Could not open directory. Aborting operation. \n");
+    }
+
+    return files_array;
+}
+
+/**
+* @brief This function casts the file type
+*
+* This function is in charge of casting the file type
+* to a human readable string.
+*
+* @param type The file type to cast
+* @return char* The human readable file type
+*/
+char *cast_file_type(unsigned char type) {
+    switch(type) {
+        case DT_REG:
+            return "Regular file";
+        case DT_DIR:
+            return "Directory";
+        case DT_LNK:
+            return "Symbolic link";
+        case DT_FIFO:
+            return "FIFO";
+        case DT_SOCK:
+            return "Socket";
+        case DT_BLK:
+            return "Block device";
+        case DT_CHR:
+            return "Character device";
+        default:
+            return "Unknown";
     }
 }
 
@@ -110,7 +182,13 @@ void read_dir(char *path) {
 */
 void supervisor(char *path) {
     printf("Listening to directory: %s\n", path);
-    read_dir(path);
+    FilesContainer files = read_dir(path);
+
+    for(int i = 0; i < files.total_nodes; i++) {
+        char *file_type = cast_file_type(files.files[i].type);
+
+        printf("File [%s]: %s (%s) \n", file_type, files.files[i].name, files.files[i].path);
+    }
 }
 
 /**
