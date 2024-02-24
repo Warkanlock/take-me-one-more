@@ -8,7 +8,7 @@
 // program information
 #define PROGRAM_NAME "Inter-frame Supervisor"
 #define AUTHOR_NAME "Ignacio Brasca"
-#define VERSION 1
+#define VERSION 1.0f
 
 // useful global constants
 #define N_FILES 100
@@ -72,7 +72,7 @@ void throw_error(char *message) {
 void head_information() {
     printf("%s\n", PROGRAM_NAME);
     printf("Developed by: %s\n", AUTHOR_NAME);
-    printf("Version: %d\n", VERSION);
+    printf("Version: %.2f\n", VERSION);
 }
 
 /**
