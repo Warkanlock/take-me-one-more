@@ -1,4 +1,4 @@
-# Define compiler and compiler flag variables
+# Define compiler and compiler flag variables (with debug)
 CC=gcc
 CFLAGS=-Wall -g
 
