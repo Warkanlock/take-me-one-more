@@ -132,6 +132,7 @@ FilesContainer read_dir(char *path) {
 
     // define array to store files found in the directory
     files_array.total_nodes = 0;
+    files_array.parent_dir = NULL;
     files_array.files = malloc(sizeof(File) * N_FILES);
 
     if(path == NULL) {
@@ -216,6 +217,25 @@ char *cast_file_type(unsigned char type) {
 }
 
 /**
+* @brief This function will resource the memory used by the files container
+*
+* This function is in charge of freeing the memory used by the files container
+*
+* @param files_container The files container to free
+* @return void
+*/
+void free_files_container(FilesContainer *files_container) {
+    for (int i = 0; i < files_container->total_nodes; i++) {
+        free(files_container->files[i].path);
+    }
+
+    free(files_container->files);
+
+    // deallocate the parent directory when is not needed
+    free(files_container->parent_dir);
+}
+
+/**
 * @brief This function is in charge of listening to a directory
 *
 * It's the main function of the program and it's in charge of
@@ -234,6 +254,8 @@ void supervisor(char *path) {
 
         printf("File [%s]: %s (%s) \n", file_type, files.files[i].name, files.files[i].path);
     }
+
+    free_files_container(&files);
 }
 
 /**
@@ -275,7 +297,10 @@ int main(int argc, char *argv[]) {
         handle_error("No path was provided. Please provide one\n");
     }
 
+    char *path = validate_path(argv[1]);
+
     head_information();
-    supervisor(validate_path(argv[1]));
+    supervisor(path);
+
     return 0;
 }
