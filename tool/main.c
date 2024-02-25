@@ -15,12 +15,12 @@
 // useful global constants
 #define N_FILES 100
 #define MAX_PATH 1024
-#define MAX_NAME 256
 #define AVOID_DIRS false
 
 // useful macros
 #define PARENT_DIR ".."
 #define CURRENT_DIR "."
+#define GLOBAL_DIFFERENCE_PATH "difference.dat"
 
 /**
 * @brief This struct represents a file
@@ -100,8 +100,8 @@ void head_information() {
 * @return char* The parent directory
 */
 char *get_parent_dir(char *path) {
-    char *cwd = malloc(1024);
-    getcwd(cwd, 1024);
+    char *cwd = malloc(MAX_PATH);
+    getcwd(cwd, MAX_PATH);
     return cwd;
 }
 
@@ -185,7 +185,7 @@ FilesContainer read_dir(char *path, bool avoid_dirs) {
     if ((dir = opendir (path)) != NULL) {
         while ((ent = readdir (dir)) != NULL) {
             // create a temporal path to store the full path of the file
-            char temporal_path[1024];
+            char temporal_path[MAX_PATH];
 
             // avoid "." and ".." directories (current and parent directories)
             if (strcmp(ent->d_name, CURRENT_DIR) == 0 || strcmp(ent->d_name, PARENT_DIR) == 0 || ent->d_name[0] == '.') {
@@ -295,7 +295,14 @@ PixelImage *create_image(unsigned int width, unsigned int height, unsigned int c
     img->height = height;
     img->width = width;
     img->max_color = color_depth;
-    img->pixels = (Pixel **)malloc(sizeof(Pixel *) * height);
+
+    // allocate memory for the pixels
+    img->pixels = (Pixel **)malloc(sizeof(Pixel *) * img->height);
+
+    // allocate memory for each row of pixels (otherwise segmentation fault will occur)
+    for(int i = 0; i < img->height; i++) {
+        img->pixels[i] = (Pixel *)malloc(sizeof(Pixel) * img->width);
+    }
 
     return img;
 }
@@ -318,6 +325,135 @@ void free_image(PixelImage *img) {
 }
 
 /**
+* @brief Computes difference between images
+*
+* This function is in charge of computing the difference between images
+*
+* @param base The base image
+* @param current The current image
+*
+* @return PixelImage* The difference between the images
+*/
+PixelImage *process_difference(PixelImage* base, PixelImage* current) {
+    PixelImage *diff = create_image(base->width, base->height, base->max_color);
+
+    for(int i = 0; i < base->height; i++) {
+        for(int j = 0; j < base->width; j++) {
+            Pixel *base_pixel = &base->pixels[i][j];
+            Pixel *current_pixel = &current->pixels[i][j];
+
+            // calculate the difference between the pixels (absolute value is needed)
+            diff->pixels[i][j].r = abs(current_pixel->r - base_pixel->r);
+            diff->pixels[i][j].g = abs(current_pixel->g - base_pixel->g);
+            diff->pixels[i][j].b = abs(current_pixel->b - base_pixel->b);
+        }
+    }
+
+    return diff;
+}
+
+/**
+* @brief This function stores the difference between images
+*
+* This function is in charge of storing the difference between images
+* in a binary file.
+*
+* @param difference The difference between images
+* @param index_diff The index of the difference
+* @return void
+*/
+void store_difference(PixelImage *difference, int index_diff) {
+    FILE *file = fopen(GLOBAL_DIFFERENCE_PATH, "wb");
+
+    if(file == NULL) {
+        throw_error("Could not open file to store the difference (maybe you don't permissions to write to disk). Aborting operation. \n");
+    }
+
+    size_t data_size = sizeof(Pixel) * difference->width * difference->height;
+
+    // we should set the position to the index_diff
+    fseek(file, index_diff * data_size, SEEK_SET);
+
+    // we should write the difference structure based on the index_diff
+    fwrite(difference->pixels, data_size, 1, file);
+
+    // close the file
+    fclose(file);
+}
+
+/**
+* @brief This function reads the difference between images
+*
+* This function is in charge of reading the difference between images
+* from a binary file.
+*
+* @param difference The difference between images
+* @param index_diff The index of the difference
+* @param data_size The path to read the difference
+*/
+void read_difference(PixelImage *difference, int index_diff, int data_size) {
+    FILE *file = fopen(GLOBAL_DIFFERENCE_PATH, "rb");
+    if (file == NULL) {
+        throw_error("Could not open file to read the difference. \n");
+        return;
+    }
+
+    // calculate the position in the file where the desired difference data starts
+    long position = index_diff * data_size;
+    fseek(file, position, SEEK_SET);
+
+    // allocate memory for the pixels if not already allocated
+    if (difference->pixels == NULL) {
+        // allocate double-array
+        difference->pixels = (Pixel**)malloc(data_size);
+        if (difference->pixels == NULL) {
+            throw_error("Memory allocation failed. \n");
+            fclose(file);
+            return;
+        }
+    }
+
+    // read the pixel data into the PixelImage structure
+    size_t readCount = fread(difference->pixels, 1, data_size, file);
+
+    if (readCount != data_size) {
+        throw_error("Failed to read the complete difference data. \n");
+    }
+
+    // close the file
+    fclose(file);
+}
+
+/**
+* @brief This function uses the difference between images
+*
+* This function is in charge of using the difference between images
+* and processing it.
+*
+* @param index_diff The index of the difference
+* @param difference_path The path to store the difference
+* @param width The width of the image
+* @param height The height of the image
+* @return void
+*/
+void use_difference(FilesContainer *files) {
+    printf("Inference process: \n");
+
+    for(int i = files->total_nodes - 1; i >= 0; i--) {
+
+        // we should process the file here and return the content
+        File file = files->files[i];
+
+        printf("Processing %s...\n", file.path);
+
+        PixelImage *image = process_image(file.path);
+
+        // once we have the image, we should free the memory
+        free_image(image);
+    }
+}
+
+/**
 * @brief This function computes the difference between images
 *
 * This function is in charge of computing the difference between images
@@ -333,10 +469,15 @@ void free_image(PixelImage *img) {
 * @param files The files container to process
 * @return void
 */
-void simulate_difference(FilesContainer *files) {
+void compute_difference(FilesContainer *files) {
     PixelImage *inception;
 
     for(int i = files->total_nodes - 1; i >= 0; i--) {
+
+        // we should process the file here and return the content
+        File file = files->files[i];
+        PixelImage *image = process_image(file.path);
+
         if(inception == NULL) {
             printf("Root\t[Inception]: %s (%s) \n", files->files[i].name, files->files[i].path);
 
@@ -345,21 +486,22 @@ void simulate_difference(FilesContainer *files) {
 
             // don't process the first image as it's the inception
             continue;
+        } else {
+            printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
+
+            // process difference between inception + image
+            PixelImage *diff = process_difference(inception, image);
+
+            // store the difference in a binary file already created
+            int index_difference = i + 1;
+            store_difference(diff, index_difference);
+
+            free_image(diff);
         }
-
-        File file = files->files[i];
-        printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
-
-        // we should process the file here and return the content
-        PixelImage *image = process_image(file.path);
-
-        // utilize image
 
         // once we have the image, we should free the memory
         free_image(image);
     }
-
-    free_files_container(files);
 }
 
 /**
@@ -376,7 +518,10 @@ void supervisor(char *path) {
 
     printf("Files found in the directory [%s]: \n\n\r", files.parent_dir);
 
-    simulate_difference(&files);
+    compute_difference(&files);
+    use_difference(&files);
+
+    free_files_container(&files);
 }
 
 /**
