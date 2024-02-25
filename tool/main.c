@@ -522,6 +522,11 @@ void compute_difference(FilesContainer *files) {
             PixelImage *diff = process_difference(inception, image);
 
             // TODO: assess threshold to understand if another inception layer should be created
+            // We should store the difference of each beam as:
+            // .inferences/{inception}/beam_{index}.bin
+            //
+            // From there we should apply the difference to the inception image corresponding to the beam
+            // to read_difference() later we should just read the inferece folder
 
             // store the difference in a binary file already created
             store_difference(diff, file_indicator++); // this will only store the difference of the non-inception beams
