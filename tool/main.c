@@ -5,6 +5,7 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 // program information
 #define PROGRAM_NAME "Inter-frame Supervisor"
@@ -13,6 +14,9 @@
 
 // useful global constants
 #define N_FILES 100
+#define MAX_PATH 1024
+#define MAX_NAME 256
+#define AVOID_DIRS false
 
 // useful macros
 #define PARENT_DIR ".."
@@ -32,6 +36,16 @@ typedef struct {
     unsigned int total_nodes;
     char* parent_dir;
 } FilesContainer;
+
+typedef struct {
+    unsigned char r, g, b;
+} Pixel;
+
+typedef struct {
+    unsigned int width, height;
+    unsigned int max_color;
+    Pixel **pixels;
+} PixelImage;
 
 /**
 * @brief This function handles internal errors
@@ -97,23 +111,50 @@ char *get_parent_dir(char *path) {
 * This function is in charge of processing the content of a path
 * and manipulate the bytes of the file.
 *
-* @param path The path of the file to process
-* @return void
+* @param path The path of the image to process
+* @return PixelImage* The image object
 */
-void process_file(char *path) {
+PixelImage *process_image(char *path) {
     FILE *file = fopen(path, "r");
 
     if(file == NULL) {
         throw_error("Could not open file. Aborting operation. \n");
     }
 
-    // read the file
-    char buffer[1024];
-    while(fgets(buffer, sizeof(buffer), file) != NULL) {
-        printf("%s", buffer);
+    // allocate memory for the content of the file
+    PixelImage *image = (PixelImage *)malloc(sizeof(PixelImage));
+    fscanf(file, "%d %d %d", &image->width, &image->height, &image->max_color);
+
+    // allocate memory for the pixels of the image (2D array of pixels)
+    // e.g:
+    // 0,0 0,1 0,2
+    // 1,0 1,1 1,2
+    // 2,0 2,1 2,2
+    // ...
+    //
+    // where each element is a pixel (r, g, b)
+    // e.g:
+    // 0,0 = (255, 255, 255)
+    // 0,1 = (255, 255, 255)
+    image->pixels = (Pixel **)malloc(sizeof(Pixel *) * image->height);
+
+    // allocate memory for each row of pixels
+    for(int i = 0; i < image->height; i++) {
+        image->pixels[i] = (Pixel *)malloc(sizeof(Pixel) * image->width);
     }
 
+    // read pixel data
+    for(int i = 0; i < image->height; i++) {
+        for(int j = 0; j < image->width; j++) {
+            fscanf(file, "%hhu %hhu %hhu", &image->pixels[i][j].r, &image->pixels[i][j].g, &image->pixels[i][j].b);
+        }
+    }
+
+    // close the file
     fclose(file);
+
+    // return the image
+    return image;
 }
 
 /**
@@ -123,9 +164,10 @@ void process_file(char *path) {
 * all the files and directories within it.
 *
 * @param path The path of the directory to read
+* @param avoid_dirs A flag to avoid reading directories
 * @return void
 */
-FilesContainer read_dir(char *path) {
+FilesContainer read_dir(char *path, bool avoid_dirs) {
     DIR *dir;
     struct dirent *ent;
     FilesContainer files_array;
@@ -146,7 +188,7 @@ FilesContainer read_dir(char *path) {
             char temporal_path[1024];
 
             // avoid "." and ".." directories (current and parent directories)
-            if (strcmp(ent->d_name, CURRENT_DIR) == 0 || strcmp(ent->d_name, PARENT_DIR) == 0) {
+            if (strcmp(ent->d_name, CURRENT_DIR) == 0 || strcmp(ent->d_name, PARENT_DIR) == 0 || ent->d_name[0] == '.') {
                 continue;
             }
 
@@ -164,13 +206,13 @@ FilesContainer read_dir(char *path) {
             }
 
             // if it's a directory, read it recursively
-            if(file.type == DT_DIR) {
-                FilesContainer files = read_dir(file.path);
+            if(avoid_dirs && file.type == DT_DIR) {
+                FilesContainer files = read_dir(file.path, avoid_dirs);
 
                 for(int i = 0; i < files.total_nodes; i++, files_array.total_nodes++) {
                     files_array.files[files_array.total_nodes] = files.files[i];
                 }
-            } else {
+            } else if (file.type == DT_REG) {
                 files_array.files[files_array.total_nodes++] = file;
             }
         }
@@ -235,6 +277,27 @@ void free_files_container(FilesContainer *files_container) {
     free(files_container->parent_dir);
 }
 
+void compute_diff(FilesContainer *files) {
+    for(int i = 0; i < files->total_nodes; i++) {
+        File file = files->files[i];
+        printf("File [%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
+
+        // we should process the file here and return the content
+        PixelImage *image = process_image(file.path);
+
+        // print image metadata
+        printf("Width: %d \n", image->width);
+        printf("Height: %d \n", image->height);
+        printf("Color: %u \n", image->max_color);
+
+        // once we have the image, we should free the memory
+        free(image->pixels);
+        free(image);
+    }
+
+    free_files_container(files);
+}
+
 /**
 * @brief This function is in charge of listening to a directory
 *
@@ -245,17 +308,11 @@ void free_files_container(FilesContainer *files_container) {
 * @return void
 */
 void supervisor(char *path) {
-    FilesContainer files = read_dir(path);
+    FilesContainer files = read_dir(path, AVOID_DIRS);
 
     printf("Files found in the directory [%s]: \n", files.parent_dir);
 
-    for(int i = 0; i < files.total_nodes; i++) {
-        char *file_type = cast_file_type(files.files[i].type);
-
-        printf("File [%s]: %s (%s) \n", file_type, files.files[i].name, files.files[i].path);
-    }
-
-    free_files_container(&files);
+    compute_diff(&files);
 }
 
 /**
