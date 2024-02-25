@@ -29,26 +29,30 @@
 /**
  * @brief This struct represents a file
  */
-typedef struct {
-  char *name;
-  char *path;
-  unsigned char type;
+typedef struct
+{
+    char* name;
+    char* path;
+    unsigned char type;
 } File;
 
-typedef struct {
-  File *files;
-  unsigned int total_nodes;
-  char *parent_dir;
+typedef struct
+{
+    File* files;
+    unsigned int total_nodes;
+    char* parent_dir;
 } FilesContainer;
 
-typedef struct {
-  unsigned char r, g, b;
+typedef struct
+{
+    unsigned char r, g, b;
 } Pixel;
 
-typedef struct {
-  unsigned int width, height;
-  unsigned int max_color;
-  Pixel **pixels;
+typedef struct
+{
+    unsigned int width, height;
+    unsigned int max_color;
+    Pixel** pixels;
 } PixelImage;
 
 /**
@@ -60,10 +64,11 @@ typedef struct {
  * @param message The message to print
  * @return void
  */
-void handle_error(char *message) {
-  errno = -1;
-  fprintf(stderr, "%s", message);
-  exit(errno);
+void handle_error(char* message)
+{
+    errno = -1;
+    fprintf(stderr, "%s", message);
+    exit(errno);
 }
 
 /**
@@ -75,9 +80,10 @@ void handle_error(char *message) {
  * @param message The message to print
  * @return void
  */
-void throw_error(char *message) {
-  perror(message);
-  exit(-1);
+void throw_error(char* message)
+{
+    perror(message);
+    exit(-1);
 }
 
 /**
@@ -88,10 +94,11 @@ void throw_error(char *message) {
  *
  * @return void
  */
-void head_information() {
-  printf("%s\n", PROGRAM_NAME);
-  printf("Developed by: %s\n", AUTHOR_NAME);
-  printf("Version: %.2f\n", VERSION);
+void head_information()
+{
+    printf("%s\n", PROGRAM_NAME);
+    printf("Developed by: %s\n", AUTHOR_NAME);
+    printf("Version: %.2f\n", VERSION);
 }
 
 /**
@@ -103,10 +110,11 @@ void head_information() {
  * @param path The path to get the parent directory from
  * @return char* The parent directory
  */
-char *get_parent_dir(char *path) {
-  char *cwd = malloc(MAX_PATH);
-  getcwd(cwd, MAX_PATH);
-  return cwd;
+char* get_parent_dir(char* path)
+{
+    char* cwd = malloc(MAX_PATH);
+    getcwd(cwd, MAX_PATH);
+    return cwd;
 }
 
 /**
@@ -118,48 +126,53 @@ char *get_parent_dir(char *path) {
  * @param path The path of the image to process
  * @return PixelImage* The image object
  */
-PixelImage *process_image(char *path) {
-  FILE *file = fopen(path, "r");
+PixelImage* process_image(char* path)
+{
+    FILE* file = fopen(path, "r");
 
-  if (file == NULL) {
-    throw_error("Could not open file. Aborting operation. \n");
-  }
-
-  // allocate memory for the content of the file
-  PixelImage *image = (PixelImage *)malloc(sizeof(PixelImage));
-  fscanf(file, "%d %d %d", &image->width, &image->height, &image->max_color);
-
-  // allocate memory for the pixels of the image (2D array of pixels)
-  // e.g:
-  // 0,0 0,1 0,2
-  // 1,0 1,1 1,2
-  // 2,0 2,1 2,2
-  // ...
-  //
-  // where each element is a pixel (r, g, b)
-  // e.g:
-  // 0,0 = (255, 255, 255)
-  // 0,1 = (255, 255, 255)
-  image->pixels = (Pixel **)malloc(sizeof(Pixel *) * image->height);
-
-  // allocate memory for each row of pixels
-  for (int i = 0; i < image->height; i++) {
-    image->pixels[i] = (Pixel *)malloc(sizeof(Pixel) * image->width);
-  }
-
-  // read pixel data
-  for (int i = 0; i < image->height; i++) {
-    for (int j = 0; j < image->width; j++) {
-      fscanf(file, "%hhu %hhu %hhu", &image->pixels[i][j].r,
-             &image->pixels[i][j].g, &image->pixels[i][j].b);
+    if (file == NULL)
+    {
+        throw_error("Could not open file. Aborting operation. \n");
     }
-  }
 
-  // close the file
-  fclose(file);
+    // allocate memory for the content of the file
+    PixelImage* image = (PixelImage*)malloc(sizeof(PixelImage));
+    fscanf(file, "%d %d %d", &image->width, &image->height, &image->max_color);
 
-  // return the image
-  return image;
+    // allocate memory for the pixels of the image (2D array of pixels)
+    // e.g:
+    // 0,0 0,1 0,2
+    // 1,0 1,1 1,2
+    // 2,0 2,1 2,2
+    // ...
+    //
+    // where each element is a pixel (r, g, b)
+    // e.g:
+    // 0,0 = (255, 255, 255)
+    // 0,1 = (255, 255, 255)
+    image->pixels = (Pixel**)malloc(sizeof(Pixel*) * image->height);
+
+    // allocate memory for each row of pixels
+    for (int i = 0; i < image->height; i++)
+    {
+        image->pixels[i] = (Pixel*)malloc(sizeof(Pixel) * image->width);
+    }
+
+    // read pixel data
+    for (int i = 0; i < image->height; i++)
+    {
+        for (int j = 0; j < image->width; j++)
+        {
+            fscanf(file, "%hhu %hhu %hhu", &image->pixels[i][j].r,
+                   &image->pixels[i][j].g, &image->pixels[i][j].b);
+        }
+    }
+
+    // close the file
+    fclose(file);
+
+    // return the image
+    return image;
 }
 
 /**
@@ -172,69 +185,83 @@ PixelImage *process_image(char *path) {
  * @param avoid_dirs A flag to avoid reading directories
  * @return void
  */
-FilesContainer read_dir(char *path, bool avoid_dirs) {
-  DIR *dir;
-  struct dirent *ent;
-  FilesContainer files_array;
+FilesContainer read_dir(char* path, bool avoid_dirs)
+{
+    DIR* dir;
+    struct dirent* ent;
+    FilesContainer files_array;
 
-  // define array to store files found in the directory
-  files_array.total_nodes = 0;
-  files_array.parent_dir = NULL;
-  files_array.files = malloc(sizeof(File) * N_FILES);
+    // define array to store files found in the directory
+    files_array.total_nodes = 0;
+    files_array.parent_dir = NULL;
+    files_array.files = malloc(sizeof(File) * N_FILES);
 
-  if (path == NULL) {
-    throw_error("No path was provided. Aborting operation. \n");
-  }
-
-  // open the directory and scan
-  if ((dir = opendir(path)) != NULL) {
-    while ((ent = readdir(dir)) != NULL) {
-      // create a temporal path to store the full path of the file
-      char temporal_path[MAX_PATH];
-
-      // avoid "." and ".." directories (current and parent directories)
-      if (strcmp(ent->d_name, CURRENT_DIR) == 0 ||
-          strcmp(ent->d_name, PARENT_DIR) == 0 || ent->d_name[0] == '.') {
-        continue;
-      }
-
-      // create a File object with full path
-      File file;
-      file.name = ent->d_name;
-      snprintf(temporal_path, sizeof(temporal_path), "%s/%s", path,
-               ent->d_name);
-      file.path = strdup(temporal_path);
-      file.type = ent->d_type;
-
-      // add the file to the array
-      if (files_array.total_nodes >= N_FILES) {
-        // TODO: handle this case properly extending the capacity of the array
-        throw_error(
-            "The number of files in the directory exceeds the limit. Aborting "
-            "operation. \n");
-      }
-
-      // if it's a directory, read it recursively
-      if (avoid_dirs && file.type == DT_DIR) {
-        FilesContainer files = read_dir(file.path, avoid_dirs);
-
-        for (int i = 0; i < files.total_nodes; i++, files_array.total_nodes++) {
-          files_array.files[files_array.total_nodes] = files.files[i];
-        }
-      } else if (file.type == DT_REG) {
-        files_array.files[files_array.total_nodes++] = file;
-      }
+    if (path == NULL)
+    {
+        throw_error("No path was provided. Aborting operation. \n");
     }
 
-    closedir(dir);
-  } else {
-    throw_error("Could not open directory. Aborting operation. \n");
-  }
+    // open the directory and scan
+    if ((dir = opendir(path)) != NULL)
+    {
+        while ((ent = readdir(dir)) != NULL)
+        {
+            // create a temporal path to store the full path of the file
+            char temporal_path[MAX_PATH];
 
-  // get current working directory + path to the directory being read
-  files_array.parent_dir = get_parent_dir(path);
+            // avoid "." and ".." directories (current and parent directories)
+            if (strcmp(ent->d_name, CURRENT_DIR) == 0 ||
+                strcmp(ent->d_name, PARENT_DIR) == 0 || ent->d_name[0] == '.')
+            {
+                continue;
+            }
 
-  return files_array;
+            // create a File object with full path
+            File file;
+            file.name = ent->d_name;
+            snprintf(temporal_path, sizeof(temporal_path), "%s/%s", path,
+                     ent->d_name);
+            file.path = strdup(temporal_path);
+            file.type = ent->d_type;
+
+            // add the file to the array
+            if (files_array.total_nodes >= N_FILES)
+            {
+                // TODO: handle this case properly extending the capacity of the
+                // array
+                throw_error("The number of files in the directory exceeds the "
+                            "limit. Aborting "
+                            "operation. \n");
+            }
+
+            // if it's a directory, read it recursively
+            if (avoid_dirs && file.type == DT_DIR)
+            {
+                FilesContainer files = read_dir(file.path, avoid_dirs);
+
+                for (int i = 0; i < files.total_nodes;
+                     i++, files_array.total_nodes++)
+                {
+                    files_array.files[files_array.total_nodes] = files.files[i];
+                }
+            }
+            else if (file.type == DT_REG)
+            {
+                files_array.files[files_array.total_nodes++] = file;
+            }
+        }
+
+        closedir(dir);
+    }
+    else
+    {
+        throw_error("Could not open directory. Aborting operation. \n");
+    }
+
+    // get current working directory + path to the directory being read
+    files_array.parent_dir = get_parent_dir(path);
+
+    return files_array;
 }
 
 /**
@@ -246,25 +273,27 @@ FilesContainer read_dir(char *path, bool avoid_dirs) {
  * @param type The file type to cast
  * @return char* The human readable file type
  */
-char *cast_file_type(unsigned char type) {
-  switch (type) {
-    case DT_REG:
-      return "Regular file";
-    case DT_DIR:
-      return "Directory";
-    case DT_LNK:
-      return "Symbolic link";
-    case DT_FIFO:
-      return "FIFO";
-    case DT_SOCK:
-      return "Socket";
-    case DT_BLK:
-      return "Block device";
-    case DT_CHR:
-      return "Character device";
-    default:
-      return "Unknown";
-  }
+char* cast_file_type(unsigned char type)
+{
+    switch (type)
+    {
+        case DT_REG:
+            return "Regular file";
+        case DT_DIR:
+            return "Directory";
+        case DT_LNK:
+            return "Symbolic link";
+        case DT_FIFO:
+            return "FIFO";
+        case DT_SOCK:
+            return "Socket";
+        case DT_BLK:
+            return "Block device";
+        case DT_CHR:
+            return "Character device";
+        default:
+            return "Unknown";
+    }
 }
 
 /**
@@ -275,15 +304,17 @@ char *cast_file_type(unsigned char type) {
  * @param files_container The files container to free
  * @return void
  */
-void free_files_container(FilesContainer *files_container) {
-  for (int i = 0; i < files_container->total_nodes; i++) {
-    free(files_container->files[i].path);
-  }
+void free_files_container(FilesContainer* files_container)
+{
+    for (int i = 0; i < files_container->total_nodes; i++)
+    {
+        free(files_container->files[i].path);
+    }
 
-  free(files_container->files);
+    free(files_container->files);
 
-  // deallocate the parent directory when is not needed
-  free(files_container->parent_dir);
+    // deallocate the parent directory when is not needed
+    free(files_container->parent_dir);
 }
 
 /**
@@ -297,25 +328,27 @@ void free_files_container(FilesContainer *files_container) {
  * @param color_depth The color depth of the image
  * @return PixelImage* The image created
  */
-PixelImage *create_image(unsigned int width, unsigned int height,
-                         unsigned int color_depth) {
-  PixelImage *img = (PixelImage *)malloc(sizeof(PixelImage));
+PixelImage* create_image(unsigned int width, unsigned int height,
+                         unsigned int color_depth)
+{
+    PixelImage* img = (PixelImage*)malloc(sizeof(PixelImage));
 
-  // initialize the image
-  img->height = height;
-  img->width = width;
-  img->max_color = color_depth;
+    // initialize the image
+    img->height = height;
+    img->width = width;
+    img->max_color = color_depth;
 
-  // allocate memory for the pixels
-  img->pixels = (Pixel **)malloc(sizeof(Pixel *) * img->height);
+    // allocate memory for the pixels
+    img->pixels = (Pixel**)malloc(sizeof(Pixel*) * img->height);
 
-  // allocate memory for each row of pixels (otherwise segmentation fault will
-  // occur)
-  for (int i = 0; i < img->height; i++) {
-    img->pixels[i] = (Pixel *)malloc(sizeof(Pixel) * img->width);
-  }
+    // allocate memory for each row of pixels (otherwise segmentation fault will
+    // occur)
+    for (int i = 0; i < img->height; i++)
+    {
+        img->pixels[i] = (Pixel*)malloc(sizeof(Pixel) * img->width);
+    }
 
-  return img;
+    return img;
 }
 
 /**
@@ -326,13 +359,15 @@ PixelImage *create_image(unsigned int width, unsigned int height,
  * @param img The image to free
  * @return void
  */
-void free_image(PixelImage *img) {
-  for (int i = 0; i < img->height; i++) {
-    free(img->pixels[i]);
-  }
+void free_image(PixelImage* img)
+{
+    for (int i = 0; i < img->height; i++)
+    {
+        free(img->pixels[i]);
+    }
 
-  free(img->pixels);
-  free(img);
+    free(img->pixels);
+    free(img);
 }
 
 /**
@@ -345,22 +380,26 @@ void free_image(PixelImage *img) {
  *
  * @return PixelImage* The difference between the images
  */
-PixelImage *process_difference(PixelImage *base, PixelImage *current) {
-  PixelImage *diff = create_image(base->width, base->height, base->max_color);
+PixelImage* process_difference(PixelImage* base, PixelImage* current)
+{
+    PixelImage* diff = create_image(base->width, base->height, base->max_color);
 
-  for (int i = 0; i < base->height; i++) {
-    for (int j = 0; j < base->width; j++) {
-      Pixel *base_pixel = &base->pixels[i][j];
-      Pixel *current_pixel = &current->pixels[i][j];
+    for (int i = 0; i < base->height; i++)
+    {
+        for (int j = 0; j < base->width; j++)
+        {
+            Pixel* base_pixel = &base->pixels[i][j];
+            Pixel* current_pixel = &current->pixels[i][j];
 
-      // calculate the difference between the pixels (absolute value is needed)
-      diff->pixels[i][j].r = abs(current_pixel->r - base_pixel->r);
-      diff->pixels[i][j].g = abs(current_pixel->g - base_pixel->g);
-      diff->pixels[i][j].b = abs(current_pixel->b - base_pixel->b);
+            // calculate the difference between the pixels (absolute value is
+            // needed)
+            diff->pixels[i][j].r = abs(current_pixel->r - base_pixel->r);
+            diff->pixels[i][j].g = abs(current_pixel->g - base_pixel->g);
+            diff->pixels[i][j].b = abs(current_pixel->b - base_pixel->b);
+        }
     }
-  }
 
-  return diff;
+    return diff;
 }
 
 /**
@@ -369,24 +408,28 @@ PixelImage *process_difference(PixelImage *base, PixelImage *current) {
  * @param path The path of the directory to create
  * @return void
  */
-void create_directory(const char *path) {
-  char tmp[MAX_PATH];
-  char *p = NULL;
-  size_t len;
+void create_directory(const char* path)
+{
+    char tmp[MAX_PATH];
+    char* p = NULL;
+    size_t len;
 
-  snprintf(tmp, sizeof(tmp), "%s", path);
-  len = strlen(tmp);
-  if (tmp[len - 1] == '/') {
-    tmp[len - 1] = 0;
-  }
-  for (p = tmp + 1; *p; p++) {
-    if (*p == '/') {
-      *p = 0;
-      mkdir(tmp, S_IRWXU);
-      *p = '/';
+    snprintf(tmp, sizeof(tmp), "%s", path);
+    len = strlen(tmp);
+    if (tmp[len - 1] == '/')
+    {
+        tmp[len - 1] = 0;
     }
-  }
-  mkdir(tmp, S_IRWXU);
+    for (p = tmp + 1; *p; p++)
+    {
+        if (*p == '/')
+        {
+            *p = 0;
+            mkdir(tmp, S_IRWXU);
+            *p = '/';
+        }
+    }
+    mkdir(tmp, S_IRWXU);
 }
 
 /**
@@ -400,22 +443,24 @@ void create_directory(const char *path) {
  *
  * @return char* The directory in charge of tracking the differences
  */
-char *get_inference_path(char *file_path, bool create_path) {
-  char *directory =
-      (char *)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
-  char *full_path =
-      (char *)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
+char* get_inference_path(char* file_path, bool create_path)
+{
+    char* directory =
+        (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
+    char* full_path =
+        (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
 
-  sprintf(directory, "%s/%s", GLOBAL_DIFFERENCE_PATH, file_path);
-  sprintf(full_path, "%s/%s.%s", directory, GLOBAL_DIFFERENCE_FILE_NAME,
-          GLOBAL_DIFFERENCE_FILE_EXTENSION);
+    sprintf(directory, "%s/%s", GLOBAL_DIFFERENCE_PATH, file_path);
+    sprintf(full_path, "%s/%s.%s", directory, GLOBAL_DIFFERENCE_FILE_NAME,
+            GLOBAL_DIFFERENCE_FILE_EXTENSION);
 
-  // create directory if any child does not exists yet
-  if (create_path) {
-    create_directory(directory);
-  }
+    // create directory if any child does not exists yet
+    if (create_path)
+    {
+        create_directory(directory);
+    }
 
-  return full_path;
+    return full_path;
 }
 
 /**
@@ -429,40 +474,45 @@ char *get_inference_path(char *file_path, bool create_path) {
  * @param index The index of the difference
  * @return void
  */
-void store_difference(PixelImage *difference, File *inception_file) {
-  // create if required path to store the difference
-  bool create_path = true;
-  char *full_path = get_inference_path(inception_file->path, create_path);
+void store_difference(PixelImage* difference, File* inception_file)
+{
+    // create if required path to store the difference
+    bool create_path = true;
+    char* full_path = get_inference_path(inception_file->path, create_path);
 
-  // open path at full_path
-  FILE *file = fopen(full_path, "wb");
+    // open path at full_path
+    FILE* file = fopen(full_path, "wb");
 
-  if (file == NULL) {
-    throw_error(
-        "Could not open file to store the difference (maybe you don't "
-        "permissions to write to disk). Aborting operation. \n");
-  }
-
-  int pixel_count = difference->width * difference->height;
-  size_t data_size = sizeof(Pixel) * pixel_count;
-  Pixel *data = (Pixel *)malloc(data_size);
-
-  // store in data pixels from the difference
-  for (int i = 0; i < difference->height; i++) {
-    for (int j = 0; j < difference->width; j++) {
-      data[i * difference->width + j] = difference->pixels[i][j];
+    if (file == NULL)
+    {
+        throw_error(
+            "Could not open file to store the difference (maybe you don't "
+            "permissions to write to disk). Aborting operation. \n");
     }
-  }
 
-  // write the difference to the file
-  int items_written = fwrite(data, sizeof(Pixel), pixel_count, file);
+    int pixel_count = difference->width * difference->height;
+    size_t data_size = sizeof(Pixel) * pixel_count;
+    Pixel* data = (Pixel*)malloc(data_size);
 
-  if (items_written != pixel_count) {
-    throw_error("Failed to write the difference to the file.\n");
-  }
+    // store in data pixels from the difference
+    for (int i = 0; i < difference->height; i++)
+    {
+        for (int j = 0; j < difference->width; j++)
+        {
+            data[i * difference->width + j] = difference->pixels[i][j];
+        }
+    }
 
-  // close the file
-  fclose(file);
+    // write the difference to the file
+    int items_written = fwrite(data, sizeof(Pixel), pixel_count, file);
+
+    if (items_written != pixel_count)
+    {
+        throw_error("Failed to write the difference to the file.\n");
+    }
+
+    // close the file
+    fclose(file);
 }
 
 /**
@@ -475,63 +525,74 @@ void store_difference(PixelImage *difference, File *inception_file) {
  * @param difference The difference between images
  * @param index_diff The index of the difference
  */
-void read_difference(char *diff_path, PixelImage *difference, int index_diff) {
-  FILE *file = fopen(diff_path, "rb");
+void read_difference(char* diff_path, PixelImage* difference, int index_diff)
+{
+    FILE* file = fopen(diff_path, "rb");
 
-  if (file == NULL) {
-    throw_error("Could not open to read the difference. \n");
-  }
-
-  // calculate the position in the file where the desired difference data starts
-  int pixel_count = difference->width * difference->height;
-  size_t data_size = sizeof(Pixel) * pixel_count;
-  Pixel *data = (Pixel *)malloc(data_size);
-
-  // read items from stream
-  size_t items_read = fread(data, sizeof(Pixel), pixel_count, file);
-
-  // iterate over data
-  for (int i = 0; i < difference->height; i++) {
-    for (int j = 0; j < difference->width; j++) {
-      // copy the data to the difference
-      difference->pixels[i][j].r = data[i * difference->width + j].r;
-      difference->pixels[i][j].g = data[i * difference->width + j].g;
-      difference->pixels[i][j].b = data[i * difference->width + j].b;
+    if (file == NULL)
+    {
+        throw_error("Could not open to read the difference. \n");
     }
-  }
 
-  if (items_read != pixel_count) {
-    throw_error("Could not read the difference from the file. \n");
-  }
+    // calculate the position in the file where the desired difference data
+    // starts
+    int pixel_count = difference->width * difference->height;
+    size_t data_size = sizeof(Pixel) * pixel_count;
+    Pixel* data = (Pixel*)malloc(data_size);
 
-  // close the file
-  fclose(file);
+    // read items from stream
+    size_t items_read = fread(data, sizeof(Pixel), pixel_count, file);
+
+    // iterate over data
+    for (int i = 0; i < difference->height; i++)
+    {
+        for (int j = 0; j < difference->width; j++)
+        {
+            // copy the data to the difference
+            difference->pixels[i][j].r = data[i * difference->width + j].r;
+            difference->pixels[i][j].g = data[i * difference->width + j].g;
+            difference->pixels[i][j].b = data[i * difference->width + j].b;
+        }
+    }
+
+    if (items_read != pixel_count)
+    {
+        throw_error("Could not read the difference from the file. \n");
+    }
+
+    // close the file
+    fclose(file);
 }
 
-char *extract_path_components(const char *path) {
-  char *final_path = (char *)malloc(strlen(path));
+char* extract_path_components(const char* path)
+{
+    char* final_path = (char*)malloc(strlen(path));
 
-  // get first slash
-  const char *first = strchr(path, '/');
+    // get first slash
+    const char* first = strchr(path, '/');
 
-  // get last slash
-  const char *last = strrchr(path, '/');
+    // get last slash
+    const char* last = strrchr(path, '/');
 
-  if (!first || !last || first == last) {
-    handle_error("Invalid path. \n");
-  }
+    if (!first || !last || first == last)
+    {
+        handle_error("Invalid path. \n");
+    }
 
-  first += 1;
-  int length = last - first;
+    first += 1;
+    int length = last - first;
 
-  if (length > 0) {
-    // assign the final path (extract from first to the length of chars between
-    // first and last)
-    sprintf(final_path, "%.*s", length, first);
-    return final_path;
-  } else {
-    return NULL;
-  }
+    if (length > 0)
+    {
+        // assign the final path (extract from first to the length of chars
+        // between first and last)
+        sprintf(final_path, "%.*s", length, first);
+        return final_path;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 /**
@@ -545,70 +606,75 @@ char *extract_path_components(const char *path) {
  *
  * @return void
  */
-void use_difference(FilesContainer *inception_container) {
-  printf("-- Inception process -- \n");
+void use_difference(FilesContainer* inception_container)
+{
+    printf("-- Inception process -- \n");
 
-  // iterate over the files
-  for (int i = 0; i < inception_container->total_nodes; i++) {
-    File *inception_file = &inception_container->files[i];
-    char *inception_path = extract_path_components(inception_file->path);
-    char *diff_path = inception_file->path;
+    // iterate over the files
+    for (int i = 0; i < inception_container->total_nodes; i++)
+    {
+        File* inception_file = &inception_container->files[i];
+        char* inception_path = extract_path_components(inception_file->path);
+        char* diff_path = inception_file->path;
 
-    printf("inception_path: %s\n", inception_path);
-    printf("diff_path: %s\n", diff_path);
+        printf("inception_path: %s\n", inception_path);
+        printf("diff_path: %s\n", diff_path);
 
-    // process the image
-    PixelImage *image = process_image(inception_path);
+        // process the image
+        PixelImage* image = process_image(inception_path);
 
-    if (image == NULL) {
-      throw_error(
-          "Could not process the image. Please try again with another path \n");
-      return;
+        if (image == NULL)
+        {
+            throw_error("Could not process the image. Please try again with "
+                        "another path \n");
+            return;
+        }
+
+        // we should read the difference from the file
+        PixelImage* difference =
+            create_image(image->width, image->height, image->max_color);
+
+        // read the difference from the file
+        read_difference(diff_path, difference, 0);
+
+        // print the difference
+        for (int i = 0; i < difference->height; i++)
+        {
+            for (int j = 0; j < difference->width; j++)
+            {
+                printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r,
+                       difference->pixels[i][j].g, difference->pixels[i][j].b);
+            }
+        }
+
+        // once we have the difference, we should store it
+        free_image(image);
     }
+    // // for now just process the image from: difference + image = beam
+    // PixelImage *image = process_image(inception_path);
 
-    // we should read the difference from the file
-    PixelImage *difference =
-        create_image(image->width, image->height, image->max_color);
+    // if (image == NULL) {
+    //     throw_error("Could not process the image. Please try again with
+    //     another path \n"); return;
+    // }
 
-    // read the difference from the file
-    read_difference(diff_path, difference, 0);
+    // // we should read the difference from the file
+    // PixelImage *difference = create_image(image->width, image->height,
+    // image->max_color);
 
-    // print the difference
-    for (int i = 0; i < difference->height; i++) {
-      for (int j = 0; j < difference->width; j++) {
-        printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r,
-               difference->pixels[i][j].g, difference->pixels[i][j].b);
-      }
-    }
+    // // read the difference from the file
+    // read_difference(diff_path, difference, 0);
 
-    // once we have the difference, we should store it
-    free_image(image);
-  }
-  // // for now just process the image from: difference + image = beam
-  // PixelImage *image = process_image(inception_path);
+    // // print the difference
+    // for(int i = 0; i < difference->height; i++) {
+    //     for(int j = 0; j < difference->width; j++) {
+    //         printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r,
+    //         difference->pixels[i][j].g, difference->pixels[i][j].b);
+    //     }
+    // }
 
-  // if (image == NULL) {
-  //     throw_error("Could not process the image. Please try again with another
-  //     path \n"); return;
-  // }
-
-  // // we should read the difference from the file
-  // PixelImage *difference = create_image(image->width, image->height,
-  // image->max_color);
-
-  // // read the difference from the file
-  // read_difference(diff_path, difference, 0);
-
-  // // print the difference
-  // for(int i = 0; i < difference->height; i++) {
-  //     for(int j = 0; j < difference->width; j++) {
-  //         printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r,
-  //         difference->pixels[i][j].g, difference->pixels[i][j].b);
-  //     }
-  // }
-
-  // // once we have the image, we should free the memory
-  // free_image(image);
+    // // once we have the image, we should free the memory
+    // free_image(image);
 }
 
 /**
@@ -629,52 +695,57 @@ void use_difference(FilesContainer *inception_container) {
  * @param files The files container to process
  * @return void
  */
-void compute_difference(FilesContainer *files) {
-  printf("-- Compute differences -- \n");
+void compute_difference(FilesContainer* files)
+{
+    printf("-- Compute differences -- \n");
 
-  // inception metadata
-  PixelImage *inception;
-  File *inception_file;
+    // inception metadata
+    PixelImage* inception;
+    File* inception_file;
 
-  for (int i = files->total_nodes - 1; i >= 0; i--) {
-    // we should process the file here and return the content
-    File file = files->files[i];
-    PixelImage *image = process_image(file.path);
+    for (int i = files->total_nodes - 1; i >= 0; i--)
+    {
+        // we should process the file here and return the content
+        File file = files->files[i];
+        PixelImage* image = process_image(file.path);
 
-    if (inception == NULL) {
-      printf("Root\t[Inception]: %s (%s) \n", files->files[i].name,
-             files->files[i].path);
+        if (inception == NULL)
+        {
+            printf("Root\t[Inception]: %s (%s) \n", files->files[i].name,
+                   files->files[i].path);
 
-      // read the first image and store it as the inception
-      inception = process_image(files->files[i].path);
+            // read the first image and store it as the inception
+            inception = process_image(files->files[i].path);
 
-      // store the file as the inception file
-      inception_file = &files->files[i];
+            // store the file as the inception file
+            inception_file = &files->files[i];
 
-      // don't process the first image as it's the inception
-      continue;
-    } else {
-      printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name,
-             file.path);
+            // don't process the first image as it's the inception
+            continue;
+        }
+        else
+        {
+            printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type),
+                   file.name, file.path);
 
-      // process difference between inception + image
-      PixelImage *diff = process_difference(inception, image);
+            // process difference between inception + image
+            PixelImage* diff = process_difference(inception, image);
 
-      // TODO: assess threshold to understand if another inception layer should
-      // be created
+            // TODO: assess threshold to understand if another inception layer
+            // should be created
 
-      // store the difference in a binary file already created
-      // this diff.dat will be store in .inferece/{path_dir}/diff.data
-      // and this binary will contain all the differences computed across the
-      // inception frame
-      store_difference(diff, inception_file);
+            // store the difference in a binary file already created
+            // this diff.dat will be store in .inferece/{path_dir}/diff.data
+            // and this binary will contain all the differences computed across
+            // the inception frame
+            store_difference(diff, inception_file);
 
-      free_image(diff);
+            free_image(diff);
+        }
+
+        // once we have the image, we should free the memory
+        free_image(image);
     }
-
-    // once we have the image, we should free the memory
-    free_image(image);
-  }
 }
 
 /**
@@ -686,17 +757,18 @@ void compute_difference(FilesContainer *files) {
  *
  * @return void
  */
-void supervisor(char *path) {
-  // prepare the difference file
-  FilesContainer files = read_dir(path, AVOID_DIRS);
-  compute_difference(&files);
+void supervisor(char* path)
+{
+    // prepare the difference file
+    FilesContainer files = read_dir(path, AVOID_DIRS);
+    compute_difference(&files);
 
-  // use the difference file
-  FilesContainer diff_files = read_dir(GLOBAL_DIFFERENCE_PATH, READ_DIRS);
-  use_difference(&diff_files);
+    // use the difference file
+    FilesContainer diff_files = read_dir(GLOBAL_DIFFERENCE_PATH, READ_DIRS);
+    use_difference(&diff_files);
 
-  // free memory used
-  free_files_container(&files);
+    // free memory used
+    free_files_container(&files);
 }
 
 /**
@@ -708,39 +780,47 @@ void supervisor(char *path) {
  * @param path The path to validate
  * @return char* The validated path
  */
-char *validate_path(char *path) {
-  if (path == NULL) {
-    throw_error("No path was provided. Please provide one\n");
-  }
+char* validate_path(char* path)
+{
+    if (path == NULL)
+    {
+        throw_error("No path was provided. Please provide one\n");
+    }
 
-  // check path was a valid directory
-  DIR *dir = opendir(path);
+    // check path was a valid directory
+    DIR* dir = opendir(path);
 
-  if (dir) {
-    closedir(dir);
-  } else {
-    throw_error("Could not open directory. Please verify the path");
-  }
+    if (dir)
+    {
+        closedir(dir);
+    }
+    else
+    {
+        throw_error("Could not open directory. Please verify the path");
+    }
 
-  // canonicalize the path
-  char *canonical_path = realpath(path, NULL);
+    // canonicalize the path
+    char* canonical_path = realpath(path, NULL);
 
-  if (canonical_path == NULL) {
-    throw_error("Could not canonicalize the path. Please verify the path");
-  }
+    if (canonical_path == NULL)
+    {
+        throw_error("Could not canonicalize the path. Please verify the path");
+    }
 
-  return path;
+    return path;
 }
 
-int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    handle_error("No path was provided. Please provide one\n");
-  }
+int main(int argc, char* argv[])
+{
+    if (argc < 2)
+    {
+        handle_error("No path was provided. Please provide one\n");
+    }
 
-  char *path = validate_path(argv[1]);
+    char* path = validate_path(argv[1]);
 
-  head_information();
-  supervisor(path);
+    head_information();
+    supervisor(path);
 
-  return 0;
+    return 0;
 }
