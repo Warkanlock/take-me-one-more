@@ -323,18 +323,28 @@ void free_image(PixelImage *img) {
 * This function is in charge of computing the difference between images
 * and storing the diff from the inception image.
 *
+* Functionality:
+*   - 1. read the first image, store it as an inception image
+*   - 2. read continuously the rest of the images and compute the difference
+*   - 2.1 in case the difference is greater than a threshold, skip the process and start again from 1. with a new inception
+*   - 2.2 in case the width or height of the next image is different, skip the process and start again from 1. with a new inception
+*   - 3. store result of diff in a binary file
+*
 * @param files The files container to process
 * @return void
 */
 void compute_diff(FilesContainer *files) {
-
-    // 1. read the first image, store it as an inception image
-    // 2. read continuously the rest of the images and compute the difference
-    // 2.1 in case the difference is greater than a threshold, skip the process and start again from 1. with a new inception
-    // 2.2 in case the width or height of the next image is different, skip the process and start again from 1. with a new inception
-    // 3. store result of diff in a binary file
+    PixelImage *inception;
 
     for(int i = 0; i < files->total_nodes; i++) {
+        if(inception == NULL) {
+            // read the first image and store it as the inception
+            inception = process_image(files->files[i].path);
+
+            // don't process the first image as it's the inception
+            continue;
+        }
+
         File file = files->files[i];
         printf("File [%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
 
