@@ -23,6 +23,8 @@
 #define PARENT_DIR ".."
 #define CURRENT_DIR "."
 #define GLOBAL_DIFFERENCE_PATH ".inference"
+#define GLOBAL_DIFFERENCE_FILE_EXTENSION "dat"
+#define GLOBAL_DIFFERENCE_FILE_NAME "diff"
 
 /**
 * @brief This struct represents a file
@@ -395,7 +397,7 @@ char *get_inference_path(char *file_path, bool create_path) {
     char *full_path = (char *)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
 
     sprintf(directory, "%s/%s", GLOBAL_DIFFERENCE_PATH, file_path);
-    sprintf(full_path, "%s/diff.dat", directory);
+    sprintf(full_path, "%s/%s.%s", directory, GLOBAL_DIFFERENCE_FILE_NAME, GLOBAL_DIFFERENCE_FILE_EXTENSION);
 
     // create directory if any child does not exists yet
     if(create_path) {
