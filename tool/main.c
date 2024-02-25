@@ -6,6 +6,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <sys/stat.h>
 
 // program information
 #define PROGRAM_NAME "Inter-frame Supervisor"
@@ -16,11 +17,12 @@
 #define N_FILES 100
 #define MAX_PATH 1024
 #define AVOID_DIRS false
+#define READ_DIRS true
 
 // useful macros
 #define PARENT_DIR ".."
 #define CURRENT_DIR "."
-#define GLOBAL_DIFFERENCE_PATH "difference.dat"
+#define GLOBAL_DIFFERENCE_PATH ".inference"
 
 /**
 * @brief This struct represents a file
@@ -353,17 +355,74 @@ PixelImage *process_difference(PixelImage* base, PixelImage* current) {
 }
 
 /**
+* @brief This function creates a directory
+* This function is in charge of creating a directory
+* @param path The path of the directory to create
+* @return void
+*/
+void create_directory(const char *path) {
+    char tmp[MAX_PATH];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp), "%s", path);
+    len = strlen(tmp);
+    if(tmp[len - 1] == '/') {
+        tmp[len - 1] = 0;
+    }
+    for(p = tmp + 1; *p; p++) {
+        if(*p == '/') {
+            *p = 0;
+            mkdir(tmp, S_IRWXU);
+            *p = '/';
+        }
+    }
+    mkdir(tmp, S_IRWXU);
+}
+
+/**
+* @brief This function gets the directory in charge of tracking the differences
+*
+* This function is in charge of getting the directory in charge of tracking the differences
+*
+* @param file_path The file path to get the directory
+* @param create_path If the path should be created
+*
+* @return char* The directory in charge of tracking the differences
+*/
+char *get_inference_path(char *file_path, bool create_path) {
+    char *directory = (char *)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
+    char *full_path = (char *)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
+
+    sprintf(directory, "%s/%s", GLOBAL_DIFFERENCE_PATH, file_path);
+    sprintf(full_path, "%s/diff.dat", directory);
+
+    // create directory if any child does not exists yet
+    if(create_path) {
+        create_directory(directory);
+    }
+
+    return full_path;
+}
+
+/**
 * @brief This function stores the difference between images
 *
 * This function is in charge of storing the difference between images
 * in a binary file.
 *
 * @param difference The difference between images
-* @param index_diff The index of the difference
+* @param inception_file The file to store the difference
+* @param index The index of the difference
 * @return void
 */
-void store_difference(PixelImage *difference, int index_diff) {
-    FILE *file = fopen(GLOBAL_DIFFERENCE_PATH, "wb");
+void store_difference(PixelImage *difference, File *inception_file) {
+    // create if required path to store the difference
+    bool create_path = true;
+    char *full_path = get_inference_path(inception_file->path, create_path);
+
+    // open path at full_path
+    FILE *file = fopen(full_path, "wb");
 
     if(file == NULL) {
         throw_error("Could not open file to store the difference (maybe you don't permissions to write to disk). Aborting operation. \n");
@@ -371,7 +430,6 @@ void store_difference(PixelImage *difference, int index_diff) {
 
     int pixel_count = difference->width * difference->height;
     size_t data_size = sizeof(Pixel) * pixel_count;
-    long position = index_diff * data_size;
     Pixel *data = (Pixel *)malloc(data_size);
 
     // store in data pixels from the difference
@@ -381,10 +439,7 @@ void store_difference(PixelImage *difference, int index_diff) {
         }
     }
 
-    // we should set the position to the index_diff
-    fseek(file, position, SEEK_SET);
-
-    // we should write the difference structure based on the index_diff
+    // write the difference to the file
     int items_written = fwrite(data, sizeof(Pixel), pixel_count, file);
 
     if (items_written != pixel_count) {
@@ -415,12 +470,9 @@ void read_difference(char *diff_path, PixelImage *difference, int index_diff) {
     // calculate the position in the file where the desired difference data starts
     int pixel_count = difference->width * difference->height;
     size_t data_size = sizeof(Pixel) * pixel_count;
-    long position = index_diff * data_size;
     Pixel *data = (Pixel *)malloc(data_size);
 
-    // set the position to the index_diff in the file
-    fseek(file, position, SEEK_SET);
-
+    // read items from stream
     size_t items_read = fread(data, sizeof(Pixel), pixel_count, file);
 
     // iterate over data
@@ -441,6 +493,31 @@ void read_difference(char *diff_path, PixelImage *difference, int index_diff) {
     fclose(file);
 }
 
+char *extract_path_components(const char *path) {
+    char *final_path = (char *)malloc(strlen(path));
+
+    // get first slash
+    const char *first = strchr(path, '/');
+
+    // get last slash
+    const char *last = strrchr(path, '/');
+
+    if (!first || !last || first == last) {
+        handle_error("Invalid path. \n");
+    }
+
+    first += 1;
+    int length = last - first;
+
+    if (length > 0) {
+        // assign the final path
+        sprintf(final_path, "%.*s", length, first);
+        return final_path;
+    } else {
+        return NULL;
+    }
+}
+
 /**
 * @brief This function uses the difference between images
 *
@@ -452,32 +529,65 @@ void read_difference(char *diff_path, PixelImage *difference, int index_diff) {
 *
 * @return void
 */
-void use_difference(char *diff_path, char *inception_path) {
-    printf("-- Inception process for %s -- \n", inception_path);
+void use_difference(FilesContainer *inception_container) {
+    printf("-- Inception process -- \n");
 
-    // for now just process the image from: difference + image = beam
-    PixelImage *image = process_image(inception_path);
+    // iterate over the files
+    for(int i = 0; i < inception_container->total_nodes; i++) {
+        File *inception_file = &inception_container->files[i];
+        char *inception_path = extract_path_components(inception_file->path);
+        char *diff_path = inception_file->path;
 
-    if (image == NULL) {
-        throw_error("Could not process the image. Please try again with another path \n");
-        return;
-    }
+        printf("inception_path: %s\n", inception_path);
+        printf("diff_path: %s\n", diff_path);
 
-    // we should read the difference from the file
-    PixelImage *difference = create_image(image->width, image->height, image->max_color);
+        // process the image
+        PixelImage *image = process_image(inception_path);
 
-    // read the difference from the file
-    read_difference(diff_path, difference, 0);
-
-    // print the difference
-    for(int i = 0; i < difference->height; i++) {
-        for(int j = 0; j < difference->width; j++) {
-            printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r, difference->pixels[i][j].g, difference->pixels[i][j].b);
+        if (image == NULL) {
+            throw_error("Could not process the image. Please try again with another path \n");
+            return;
         }
-    }
 
-    // once we have the image, we should free the memory
-    free_image(image);
+        // we should read the difference from the file
+        PixelImage *difference = create_image(image->width, image->height, image->max_color);
+
+        // read the difference from the file
+        read_difference(diff_path, difference, 0);
+
+        // print the difference
+        for(int i = 0; i < difference->height; i++) {
+            for(int j = 0; j < difference->width; j++) {
+                printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r, difference->pixels[i][j].g, difference->pixels[i][j].b);
+            }
+        }
+
+        // once we have the difference, we should store it
+        free_image(image);
+    }
+    // // for now just process the image from: difference + image = beam
+    // PixelImage *image = process_image(inception_path);
+
+    // if (image == NULL) {
+    //     throw_error("Could not process the image. Please try again with another path \n");
+    //     return;
+    // }
+
+    // // we should read the difference from the file
+    // PixelImage *difference = create_image(image->width, image->height, image->max_color);
+
+    // // read the difference from the file
+    // read_difference(diff_path, difference, 0);
+
+    // // print the difference
+    // for(int i = 0; i < difference->height; i++) {
+    //     for(int j = 0; j < difference->width; j++) {
+    //         printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r, difference->pixels[i][j].g, difference->pixels[i][j].b);
+    //     }
+    // }
+
+    // // once we have the image, we should free the memory
+    // free_image(image);
 }
 
 /**
@@ -499,8 +609,9 @@ void use_difference(char *diff_path, char *inception_path) {
 void compute_difference(FilesContainer *files) {
     printf("-- Compute differences -- \n");
 
+    // inception metadata
     PixelImage *inception;
-    unsigned int file_indicator = 0;
+    File *inception_file;
 
     for(int i = files->total_nodes - 1; i >= 0; i--) {
         // we should process the file here and return the content
@@ -513,6 +624,9 @@ void compute_difference(FilesContainer *files) {
             // read the first image and store it as the inception
             inception = process_image(files->files[i].path);
 
+            // store the file as the inception file
+            inception_file = &files->files[i];
+
             // don't process the first image as it's the inception
             continue;
         } else {
@@ -522,14 +636,12 @@ void compute_difference(FilesContainer *files) {
             PixelImage *diff = process_difference(inception, image);
 
             // TODO: assess threshold to understand if another inception layer should be created
-            // We should store the difference of each beam as:
-            // .inferences/{inception}/beam_{index}.bin
-            //
-            // From there we should apply the difference to the inception image corresponding to the beam
-            // to read_difference() later we should just read the inferece folder
 
             // store the difference in a binary file already created
-            store_difference(diff, file_indicator++); // this will only store the difference of the non-inception beams
+            // this diff.dat will be store in .inferece/{path_dir}/diff.data
+            // and this binary will contain all the differences computed across the inception
+            // frame
+            store_difference(diff, inception_file);
 
             free_image(diff);
         }
@@ -549,16 +661,15 @@ void compute_difference(FilesContainer *files) {
 * @return void
 */
 void supervisor(char *path) {
+    // prepare the difference file
     FilesContainer files = read_dir(path, AVOID_DIRS);
-
-    printf("Files found in the directory [%s]: \n\n\r", files.parent_dir);
-
     compute_difference(&files);
 
-    // TODO: we should iterate against inception files only (not all files in the directory)
-    // and from there, apply the difference to the inception image corresponding to the file
-    use_difference(GLOBAL_DIFFERENCE_PATH, "playground/inception");
+    // use the difference file
+    FilesContainer diff_files = read_dir(GLOBAL_DIFFERENCE_PATH, READ_DIRS);
+    use_difference(&diff_files);
 
+    // free memory used
     free_files_container(&files);
 }
 
