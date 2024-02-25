@@ -277,7 +277,63 @@ void free_files_container(FilesContainer *files_container) {
     free(files_container->parent_dir);
 }
 
+/**
+* @brief This function creates an image
+*
+* This function is in charge of creating an image
+* and allocating the memory for it.
+*
+* @param width The width of the image
+* @param height The height of the image
+* @param color_depth The color depth of the image
+* @return PixelImage* The image created
+*/
+PixelImage *create_image(unsigned int width, unsigned int height, unsigned int color_depth) {
+    PixelImage *img = (PixelImage *)malloc(sizeof(PixelImage));
+
+    // initialize the image
+    img->height = height;
+    img->width = width;
+    img->max_color = color_depth;
+    img->pixels = (Pixel **)malloc(sizeof(Pixel *) * height);
+
+    return img;
+}
+
+/**
+* @brief This function frees the memory used by an image
+*
+* This function is in charge of freeing the memory used by an image
+*
+* @param img The image to free
+* @return void
+*/
+void free_image(PixelImage *img) {
+    for(int i = 0; i < img->height; i++) {
+        free(img->pixels[i]);
+    }
+
+    free(img->pixels);
+    free(img);
+}
+
+/**
+* @brief This function computes the difference between images
+*
+* This function is in charge of computing the difference between images
+* and storing the diff from the inception image.
+*
+* @param files The files container to process
+* @return void
+*/
 void compute_diff(FilesContainer *files) {
+
+    // 1. read the first image, store it as an inception image
+    // 2. read continuously the rest of the images and compute the difference
+    // 2.1 in case the difference is greater than a threshold, skip the process and start again from 1. with a new inception
+    // 2.2 in case the width or height of the next image is different, skip the process and start again from 1. with a new inception
+    // 3. store result of diff in a binary file
+
     for(int i = 0; i < files->total_nodes; i++) {
         File file = files->files[i];
         printf("File [%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
@@ -285,14 +341,10 @@ void compute_diff(FilesContainer *files) {
         // we should process the file here and return the content
         PixelImage *image = process_image(file.path);
 
-        // print image metadata
-        printf("Width: %d \n", image->width);
-        printf("Height: %d \n", image->height);
-        printf("Color: %u \n", image->max_color);
+        // utilize image
 
         // once we have the image, we should free the memory
-        free(image->pixels);
-        free(image);
+        free_image(image);
     }
 
     free_files_container(files);
