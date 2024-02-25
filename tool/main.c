@@ -336,8 +336,10 @@ void free_image(PixelImage *img) {
 void simulate_difference(FilesContainer *files) {
     PixelImage *inception;
 
-    for(int i = 0; i < files->total_nodes; i++) {
+    for(int i = files->total_nodes - 1; i >= 0; i--) {
         if(inception == NULL) {
+            printf("Root\t[Inception]: %s (%s) \n", files->files[i].name, files->files[i].path);
+
             // read the first image and store it as the inception
             inception = process_image(files->files[i].path);
 
@@ -346,7 +348,7 @@ void simulate_difference(FilesContainer *files) {
         }
 
         File file = files->files[i];
-        printf("File [%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
+        printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
 
         // we should process the file here and return the content
         PixelImage *image = process_image(file.path);
@@ -372,7 +374,7 @@ void simulate_difference(FilesContainer *files) {
 void supervisor(char *path) {
     FilesContainer files = read_dir(path, AVOID_DIRS);
 
-    printf("Files found in the directory [%s]: \n", files.parent_dir);
+    printf("Files found in the directory [%s]: \n\n\r", files.parent_dir);
 
     simulate_difference(&files);
 }
