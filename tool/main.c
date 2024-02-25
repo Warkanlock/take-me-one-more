@@ -333,7 +333,7 @@ void free_image(PixelImage *img) {
 * @param files The files container to process
 * @return void
 */
-void compute_diff(FilesContainer *files) {
+void simulate_difference(FilesContainer *files) {
     PixelImage *inception;
 
     for(int i = 0; i < files->total_nodes; i++) {
@@ -374,7 +374,7 @@ void supervisor(char *path) {
 
     printf("Files found in the directory [%s]: \n", files.parent_dir);
 
-    compute_diff(&files);
+    simulate_difference(&files);
 }
 
 /**
