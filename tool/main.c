@@ -369,13 +369,27 @@ void store_difference(PixelImage *difference, int index_diff) {
         throw_error("Could not open file to store the difference (maybe you don't permissions to write to disk). Aborting operation. \n");
     }
 
-    size_t data_size = sizeof(Pixel) * difference->width * difference->height;
+    int pixel_count = difference->width * difference->height;
+    size_t data_size = sizeof(Pixel) * pixel_count;
+    long position = index_diff * data_size;
+    Pixel *data = (Pixel *)malloc(data_size);
+
+    // store in data pixels from the difference
+    for(int i = 0; i < difference->height; i++) {
+        for(int j = 0; j < difference->width; j++) {
+            data[i * difference->width + j] = difference->pixels[i][j];
+        }
+    }
 
     // we should set the position to the index_diff
-    fseek(file, index_diff * data_size, SEEK_SET);
+    fseek(file, position, SEEK_SET);
 
     // we should write the difference structure based on the index_diff
-    fwrite(difference->pixels, data_size, 1, file);
+    int items_written = fwrite(data, sizeof(Pixel), pixel_count, file);
+
+    if (items_written != pixel_count) {
+        throw_error("Failed to write the difference to the file.\n");
+    }
 
     // close the file
     fclose(file);
@@ -389,35 +403,37 @@ void store_difference(PixelImage *difference, int index_diff) {
 *
 * @param difference The difference between images
 * @param index_diff The index of the difference
-* @param data_size The path to read the difference
 */
-void read_difference(PixelImage *difference, int index_diff, int data_size) {
+void read_difference(PixelImage *difference, int index_diff) {
     FILE *file = fopen(GLOBAL_DIFFERENCE_PATH, "rb");
+
     if (file == NULL) {
-        throw_error("Could not open file to read the difference. \n");
-        return;
+        throw_error("Could not open to read the difference. \n");
     }
 
     // calculate the position in the file where the desired difference data starts
+    int pixel_count = difference->width * difference->height;
+    size_t data_size = sizeof(Pixel) * pixel_count;
     long position = index_diff * data_size;
+    Pixel *data = (Pixel *)malloc(data_size);
+
+    // set the position to the index_diff in the file
     fseek(file, position, SEEK_SET);
 
-    // allocate memory for the pixels if not already allocated
-    if (difference->pixels == NULL) {
-        // allocate double-array
-        difference->pixels = (Pixel**)malloc(data_size);
-        if (difference->pixels == NULL) {
-            throw_error("Memory allocation failed. \n");
-            fclose(file);
-            return;
+    size_t items_read = fread(data, sizeof(Pixel), pixel_count, file);
+
+    // iterate over data
+    for(int i = 0; i < difference->height; i++) {
+        for(int j = 0; j < difference->width; j++) {
+            // copy the data to the difference
+            difference->pixels[i][j].r = data[i * difference->width + j].r;
+            difference->pixels[i][j].g = data[i * difference->width + j].g;
+            difference->pixels[i][j].b = data[i * difference->width + j].b;
         }
     }
 
-    // read the pixel data into the PixelImage structure
-    size_t readCount = fread(difference->pixels, 1, data_size, file);
-
-    if (readCount != data_size) {
-        throw_error("Failed to read the complete difference data. \n");
+    if (items_read != pixel_count) {
+        throw_error("Could not read the difference from the file. \n");
     }
 
     // close the file
@@ -430,27 +446,32 @@ void read_difference(PixelImage *difference, int index_diff, int data_size) {
 * This function is in charge of using the difference between images
 * and processing it.
 *
-* @param index_diff The index of the difference
-* @param difference_path The path to store the difference
-* @param width The width of the image
-* @param height The height of the image
 * @return void
 */
-void use_difference(FilesContainer *files) {
-    printf("Inference process: \n");
+void use_difference(char *inception_path) {
+    // for now just process the image from: difference + image = beam
+    PixelImage *image = process_image(inception_path);
 
-    for(int i = files->total_nodes - 1; i >= 0; i--) {
-
-        // we should process the file here and return the content
-        File file = files->files[i];
-
-        printf("Processing %s...\n", file.path);
-
-        PixelImage *image = process_image(file.path);
-
-        // once we have the image, we should free the memory
-        free_image(image);
+    if (image == NULL) {
+        throw_error("Could not process the image. Please try again with another path \n");
+        return;
     }
+
+    // we should read the difference from the file
+    PixelImage *difference = create_image(image->width, image->height, image->max_color);
+
+    // read the difference from the file
+    read_difference(difference, 0);
+
+    // print the difference
+    for(int i = 0; i < difference->height; i++) {
+        for(int j = 0; j < difference->width; j++) {
+            printf("R: %d, G: %d, B: %d\n", difference->pixels[i][j].r, difference->pixels[i][j].g, difference->pixels[i][j].b);
+        }
+    }
+
+    // once we have the image, we should free the memory
+    free_image(image);
 }
 
 /**
@@ -471,9 +492,9 @@ void use_difference(FilesContainer *files) {
 */
 void compute_difference(FilesContainer *files) {
     PixelImage *inception;
+    unsigned int file_indicator = 0;
 
     for(int i = files->total_nodes - 1; i >= 0; i--) {
-
         // we should process the file here and return the content
         File file = files->files[i];
         PixelImage *image = process_image(file.path);
@@ -492,9 +513,10 @@ void compute_difference(FilesContainer *files) {
             // process difference between inception + image
             PixelImage *diff = process_difference(inception, image);
 
+            // TODO: assess threshold to understand if another inception layer should be created
+
             // store the difference in a binary file already created
-            int index_difference = i + 1;
-            store_difference(diff, index_difference);
+            store_difference(diff, file_indicator++);
 
             free_image(diff);
         }
@@ -519,7 +541,9 @@ void supervisor(char *path) {
     printf("Files found in the directory [%s]: \n\n\r", files.parent_dir);
 
     compute_difference(&files);
-    use_difference(&files);
+
+    // use the difference as a test
+    use_difference("playground/inception");
 
     free_files_container(&files);
 }
