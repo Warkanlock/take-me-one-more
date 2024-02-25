@@ -512,7 +512,7 @@ char *extract_path_components(const char *path) {
     int length = last - first;
 
     if (length > 0) {
-        // assign the final path
+        // assign the final path (extract from first to the length of chars between first and last)
         sprintf(final_path, "%.*s", length, first);
         return final_path;
     } else {
