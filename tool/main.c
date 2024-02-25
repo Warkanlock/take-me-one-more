@@ -401,11 +401,12 @@ void store_difference(PixelImage *difference, int index_diff) {
 * This function is in charge of reading the difference between images
 * from a binary file.
 *
+* @param diff_path The path to the difference file
 * @param difference The difference between images
 * @param index_diff The index of the difference
 */
-void read_difference(PixelImage *difference, int index_diff) {
-    FILE *file = fopen(GLOBAL_DIFFERENCE_PATH, "rb");
+void read_difference(char *diff_path, PixelImage *difference, int index_diff) {
+    FILE *file = fopen(diff_path, "rb");
 
     if (file == NULL) {
         throw_error("Could not open to read the difference. \n");
@@ -446,9 +447,14 @@ void read_difference(PixelImage *difference, int index_diff) {
 * This function is in charge of using the difference between images
 * and processing it.
 *
+* @param diff_path The path to the difference
+* @param inception_path The path to the inception image
+*
 * @return void
 */
-void use_difference(char *inception_path) {
+void use_difference(char *diff_path, char *inception_path) {
+    printf("-- Inception process for %s -- \n", inception_path);
+
     // for now just process the image from: difference + image = beam
     PixelImage *image = process_image(inception_path);
 
@@ -461,7 +467,7 @@ void use_difference(char *inception_path) {
     PixelImage *difference = create_image(image->width, image->height, image->max_color);
 
     // read the difference from the file
-    read_difference(difference, 0);
+    read_difference(diff_path, difference, 0);
 
     // print the difference
     for(int i = 0; i < difference->height; i++) {
@@ -491,6 +497,8 @@ void use_difference(char *inception_path) {
 * @return void
 */
 void compute_difference(FilesContainer *files) {
+    printf("-- Compute differences -- \n");
+
     PixelImage *inception;
     unsigned int file_indicator = 0;
 
@@ -516,7 +524,7 @@ void compute_difference(FilesContainer *files) {
             // TODO: assess threshold to understand if another inception layer should be created
 
             // store the difference in a binary file already created
-            store_difference(diff, file_indicator++);
+            store_difference(diff, file_indicator++); // this will only store the difference of the non-inception beams
 
             free_image(diff);
         }
@@ -542,8 +550,9 @@ void supervisor(char *path) {
 
     compute_difference(&files);
 
-    // use the difference as a test
-    use_difference("playground/inception");
+    // TODO: we should iterate against inception files only (not all files in the directory)
+    // and from there, apply the difference to the inception image corresponding to the file
+    use_difference(GLOBAL_DIFFERENCE_PATH, "playground/inception");
 
     free_files_container(&files);
 }
