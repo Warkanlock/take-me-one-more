@@ -13,7 +13,7 @@ OBJS=$(SRCS:src/%.c=$(OBJDIR)/%.o)
 # Test source files (assuming they're in tests/ directory and use Unity)
 TEST_SRCS=$(wildcard tests/*.c)
 TEST_OBJS=$(TEST_SRCS:tests/%.c=$(OBJDIR)/%.o)
-TEST_TARGET=$(OUTDIR)/test_runner
+TEST_TARGET=$(OUTDIR)/interframe_test-runner
 
 # Define compiler and compiler flag variables (with debug)
 CC=gcc
