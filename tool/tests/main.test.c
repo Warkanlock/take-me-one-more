@@ -1,25 +1,29 @@
 #include "../unity/unity.h"
 
-void setUp(void) {
+void setUp(void)
+{
     // set stuff up here
 }
 
-void tearDown(void) {
+void tearDown(void)
+{
     // clean stuff up here
 }
 
-void example_test_pass(void) {
-    TEST_ASSERT_EQUAL(1, 1);
-}
-
-void example_test_fail(void) {
-    TEST_ASSERT_FALSE(1 == 2);
-}
+extern void example_test_pass(void);
+extern void example_test_fail(void);
+extern void check_program_information(void);
+extern void check_program_constants(void);
+extern void check_macros(void);
 
 int main(void)
 {
-    UNITY_BEGIN();
+    UnityBegin("tests/example.test.c");
     RUN_TEST(example_test_pass);
     RUN_TEST(example_test_fail);
-    UNITY_END(); // stop unit testing
+    UnityBegin("tests/globals.test.c");
+    RUN_TEST(check_program_information);
+    RUN_TEST(check_program_constants);
+    RUN_TEST(check_macros);
+    return (UnityEnd());
 }
