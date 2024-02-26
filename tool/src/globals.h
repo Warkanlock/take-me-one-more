@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 // program information
 #define PROGRAM_NAME "Inter-frame Supervisor"
 #define AUTHOR_NAME "Ignacio Brasca"
@@ -15,3 +17,5 @@
 #define GLOBAL_DIFFERENCE_PATH ".inference"
 #define GLOBAL_DIFFERENCE_FILE_EXTENSION "dat"
 #define GLOBAL_DIFFERENCE_FILE_NAME "diff"
+
+void head_information();

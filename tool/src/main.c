@@ -1,5 +1,8 @@
+#include "file.h"
+#include "beam.h"
+#include "globals.h"
+#include "error.h"
 #include <dirent.h>
-#include <errno.h>
 #include <iso646.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -7,87 +10,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "globals.h"
-
-/**
- * @brief This struct represents a file
- */
-typedef struct
-{
-    char* name;
-    char* path;
-    unsigned char type;
-} File;
-
-typedef struct
-{
-    File* files;
-    unsigned int total_nodes;
-    char* parent_dir;
-} FilesContainer;
-
-typedef struct
-{
-    unsigned char r, g, b;
-} Pixel;
-
-typedef struct
-{
-    unsigned int width, height;
-    unsigned int max_color;
-    Pixel** pixels;
-} PixelImage;
-
-typedef struct
-{
-    int test;
-} Test;
-
-/**
- * @brief This function handles internal errors
- *
- * This function is in charge of handling errors and
- * printing the corresponding message.
- *
- * @param message The message to print
- * @return void
- */
-void handle_error(char* message)
-{
-    errno = -1;
-    fprintf(stderr, "%s", message);
-    exit(errno);
-}
-
-/**
- * @brief This function handles external errors
- *
- * This function is in charge of handling errors and
- * printing the corresponding message.
- *
- * @param message The message to print
- * @return void
- */
-void throw_error(char* message)
-{
-    perror(message);
-    exit(-1);
-}
-
-/**
- * @brief This function prints the program information
- *
- * This function is in charge of printing the program information
- * such as the program name, the author and the version.
- *
- * @return void
- */
-void head_information()
-{
-    printf("%s\n", PROGRAM_NAME);
-    printf("Developed by: %s\n", AUTHOR_NAME);
-    printf("Version: %.2f\n", VERSION);
-}
 
 /**
  * @brief This function gets the parent directory of a path
