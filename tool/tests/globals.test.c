@@ -1,4 +1,4 @@
-#include "../src/globals.h"
+#include "../src/global.h"
 #include "../unity/unity.h"
 #include <stdbool.h>
 

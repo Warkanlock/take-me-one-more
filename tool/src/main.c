@@ -1,7 +1,7 @@
-#include "file.h"
 #include "beam.h"
-#include "globals.h"
 #include "error.h"
+#include "file.h"
+#include "global.h"
 #include <dirent.h>
 #include <iso646.h>
 #include <stdbool.h>

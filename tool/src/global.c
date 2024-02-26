@@ -1,4 +1,4 @@
-#include "globals.h"
+#include "global.h"
 
 /**
  * @brief This function prints the program information
