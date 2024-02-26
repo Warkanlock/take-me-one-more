@@ -1,27 +1,51 @@
+# Define the target executable name, output directory, and object directory
+TARGET=src
+OUTDIR=dist
+OBJDIR=$(OUTDIR)/objs
+ARGS=playground
+UNITY=unity
+TEST_DIR=tests
+
+# All source files inside src/
+SRCS=$(wildcard src/*.c)
+OBJS=$(SRCS:src/%.c=$(OBJDIR)/%.o)
+
+# Test source files (assuming they're in tests/ directory and use Unity)
+TEST_SRCS=$(wildcard tests/*.c)
+TEST_OBJS=$(TEST_SRCS:tests/%.c=$(OBJDIR)/%.o)
+TEST_TARGET=$(OUTDIR)/test_runner
+
 # Define compiler and compiler flag variables (with debug)
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -I$(TARGET) -I$(UNITY)
 
-# Define the target executable name and the output directory
-TARGET=main
-OUTDIR=dist
-ARGS=playground
+# Ensure the output and object directories exist
+$(shell mkdir -p $(OUTDIR) $(OBJDIR))
 
-# default rule to build the target executable
-all: $(OUTDIR)/$(TARGET)
+# Target for compiling the main application
+compile: $(OBJS)
+	$(CC) -o $(OUTDIR)/$(TARGET) $^ $(CFLAGS)
 
-# ensure the output directory exists
-$(OUTDIR):
-	@mkdir -p $(OUTDIR)
+# Target for running the main application
+run: compile
+	./$(OUTDIR)/$(TARGET) $(ARGS)
 
-# build the target executable
-$(OUTDIR)/$(TARGET): $(TARGET).c | $(OUTDIR)
-	@$(CC) $(CFLAGS) -o $@ $(TARGET).c
+# Target for compiling and running the test code
+test: $(TEST_OBJS)
+	$(CC) -o $(TEST_TARGET) $^ $(CFLAGS) $(UNITY)/unity.c
+	./$(TEST_TARGET)
 
-# clean
+# Target for cleaning up the build
 clean:
-	@rm -rf $(OUTDIR)
+	rm -rf $(OUTDIR)/* $(OBJDIR) $(TARGET)/*.o $(TEST_DIR)/*.o
 
-# run the target executable and pass arguments to it
-run: $(OUTDIR)/$(TARGET)
-	@./$< $(ARGS)
+# Pattern rule for object files, adjusted to use the OBJDIR
+$(OBJDIR)/%.o: src/%.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+# Pattern rule for test object files, adjusted to use the OBJDIR
+$(OBJDIR)/%.o: tests/%.c
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+# Special targets
+.PHONY: compile run test clean
