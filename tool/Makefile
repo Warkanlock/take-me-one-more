@@ -13,7 +13,9 @@ OBJS=$(SRCS:src/%.c=$(OBJDIR)/%.o)
 # Test source files (assuming they're in tests/ directory and use Unity)
 TEST_SRCS=$(wildcard tests/*.c)
 TEST_OBJS=$(TEST_SRCS:tests/%.c=$(OBJDIR)/%.o)
+
 TEST_TARGET=$(OUTDIR)/interframe_test-runner
+SOURCE_TARGET=$(OUTDIR)/interframe
 
 # Define compiler and compiler flag variables (with debug)
 CC=gcc
@@ -24,11 +26,11 @@ $(shell mkdir -p $(OUTDIR) $(OBJDIR))
 
 # Target for compiling the main application
 compile: $(OBJS)
-	$(CC) -o $(OUTDIR)/$(TARGET) $^ $(CFLAGS)
+	$(CC) -o $(SOURCE_TARGET) $^ $(CFLAGS)
 
 # Target for running the main application
 run: compile
-	./$(OUTDIR)/$(TARGET) $(ARGS)
+	./$(SOURCE_TARGET) $(ARGS)
 
 # Target for compiling and running the test code
 test: $(TEST_OBJS)
@@ -38,6 +40,9 @@ test: $(TEST_OBJS)
 # Target for cleaning up the build
 clean:
 	rm -rf $(OUTDIR)/* $(OBJDIR) $(TARGET)/*.o $(TEST_DIR)/*.o
+
+debug: compile  # Target for debugging the main application
+	lldb $(SOURCE_TARGET) # Use lldb to debug the main application
 
 # Pattern rule for object files, adjusted to use the OBJDIR
 $(OBJDIR)/%.o: src/%.c
