@@ -1,4 +1,5 @@
-#include <stdio.h>
+#ifndef _HEAD_INFORMATION_H_
+#define _HEAD_INFORMATION_H_
 
 // program information
 #define PROGRAM_NAME "Inter-frame Supervisor"
@@ -19,3 +20,5 @@
 #define GLOBAL_DIFFERENCE_FILE_NAME "diff"
 
 void head_information();
+
+#endif

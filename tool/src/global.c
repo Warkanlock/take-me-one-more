@@ -1,4 +1,5 @@
 #include "global.h"
+#include <stdio.h>
 
 /**
  * @brief This function prints the program information

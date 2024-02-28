@@ -32,8 +32,11 @@ compile: $(OBJS)
 run: compile
 	./$(SOURCE_TARGET) $(ARGS)
 
+# Filter out main.o from the list of object files
+OBJS_WITHOUT_MAIN=$(filter-out $(OBJDIR)/main.o, $(OBJS))
+
 # Target for compiling and running the test code
-test: $(TEST_OBJS)
+test: $(TEST_OBJS) $(OBJS_WITHOUT_MAIN)
 	$(CC) -o $(TEST_TARGET) $^ $(CFLAGS) $(UNITY)/unity.c
 	./$(TEST_TARGET)
 

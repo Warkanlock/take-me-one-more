@@ -1,3 +1,6 @@
+#ifndef BEAM_H
+#define BEAM_H
+
 typedef struct
 {
     unsigned char r, g, b;
@@ -9,3 +12,5 @@ typedef struct
     unsigned int max_color;
     Pixel** pixels;
 } PixelImage;
+
+#endif
