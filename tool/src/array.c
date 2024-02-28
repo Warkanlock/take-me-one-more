@@ -37,7 +37,7 @@ void push(dynamic_array* arr, void* value)
         }
 
         // reallocate memory for the array for the new capacity
-        arr->items = (void*)realloc(arr->items, arr->capacity * sizeof(*arr->items));
+        arr->items = (void**)realloc(arr->items, arr->capacity * sizeof(*arr->items));
     }
 
     // add the value to the array
@@ -57,7 +57,7 @@ void* pop(dynamic_array* arr)
         return NULL;
     }
 
-    return &arr->items[--arr->count];
+    return arr->items[--arr->count];
 }
 
 /**
@@ -74,7 +74,7 @@ void* get(dynamic_array* arr, unsigned int index)
         return NULL;
     }
 
-    return &arr->items[index];
+    return arr->items[index]; // type = void**
 }
 
 /**
@@ -90,5 +90,5 @@ size_t get_capacity(dynamic_array* arr) { return arr->capacity; }
  *
  * @param arr The array to get the count of
  * @return The total count of items of the array
-*/
+ */
 size_t get_count(dynamic_array* arr) { return arr->count; }

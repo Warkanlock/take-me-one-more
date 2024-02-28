@@ -8,7 +8,7 @@
 
 typedef struct
 {
-    void** items;
+    void** items;    // double array
     size_t count;    // current count of elements of the array
     size_t capacity; // capacity of the array
 } dynamic_array;

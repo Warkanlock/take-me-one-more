@@ -45,28 +45,44 @@ void check_get_capacity(void)
 void check_get_after_push(void)
 {
     dynamic_array* array = create_array();
+
+    // insert element
     int* item = malloc(sizeof(int));
     *item = 1;
     push(array, item);
-    TEST_ASSERT_EQUAL(1, get(array, 0));
+
+    // assert equality
+    int* result = get(array, 0);
+    TEST_ASSERT_EQUAL(1, *result);
     release_array(array);
 }
 
 void check_push(void)
 {
     dynamic_array* array = create_array();
-    push(array, 1);
-    TEST_ASSERT_EQUAL(1, array->items[0]);
+
+    // insert item into array
+    int* item = malloc(sizeof(int));
+    *item = 1;
+    push(array, item);
+
+    TEST_ASSERT_EQUAL(1, get_count(array));
     release_array(array);
 }
 
 void check_pop(void)
 {
     dynamic_array* array = create_array();
+
+    // insert element into array
     int* item = malloc(sizeof(int));
     *item = 1;
     push(array, item);
+
+    // return value from pop
     int* value = pop(array);
+
+    // assert equality
     TEST_ASSERT_EQUAL(1, *value);
     release_array(array);
 }
@@ -77,8 +93,28 @@ void check_pop_by_reference(void)
     int* item = malloc(sizeof(int));
     *item = 1;
     push(array, item);
+
     int* value = pop(array);
-    *value = 2;
-    TEST_ASSERT_EQUAL(2, array->items[0]);
+    TEST_ASSERT_EQUAL(value, array->items[0]);
+    release_array(array);
+}
+
+void check_simple_use_case(void) {
+    dynamic_array* array = create_array();
+    int* item = malloc(sizeof(int));
+    *item = 1;
+    push(array, item);
+    int* value = pop(array);
+    TEST_ASSERT_EQUAL(1, *value);
+    release_array(array);
+}
+
+void check_simple_use_case_with_char(void) {
+    dynamic_array* array = create_array();
+    char* item = malloc(sizeof(char));
+    *item = 'a';
+    push(array, item);
+    char* value = pop(array);
+    TEST_ASSERT_EQUAL('a', *value);
     release_array(array);
 }

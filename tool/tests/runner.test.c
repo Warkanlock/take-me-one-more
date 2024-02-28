@@ -28,6 +28,8 @@ extern void check_get_capacity(void);
 extern void check_get_capacity_after_push(void);
 extern void check_get_after_push(void);
 extern void check_get_count(void);
+extern void check_simple_use_case(void);
+extern void check_simple_use_case_with_char(void);
 
 int main(void)
 {
@@ -52,6 +54,8 @@ int main(void)
     RUN_TEST(check_get_capacity_after_push);
     RUN_TEST(check_get_after_push);
     RUN_TEST(check_get_count);
+    RUN_TEST(check_simple_use_case);
+    RUN_TEST(check_simple_use_case_with_char);
     UnityEnd();
 
     return 0;
