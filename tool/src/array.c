@@ -3,12 +3,12 @@
 /**
  * Create a new dynamic array for integers
  */
-int_array* create_array() { return (int_array*)malloc(sizeof(int_array)); }
+dynamic_array* create_array() { return (dynamic_array*)malloc(sizeof(dynamic_array)); }
 
 /**
  * Free the memory used by the array
  */
-void release_array(int_array* arr)
+void release_array(dynamic_array* arr)
 {
     free(arr->items);
     free(arr);
@@ -20,7 +20,7 @@ void release_array(int_array* arr)
  * @param arr The array to add the value to
  * @param value The value to add to the array
  */
-void push(int_array* arr, int value)
+void push(dynamic_array* arr, void* value)
 {
     // allocate memory for the array
     if (arr->count >= arr->capacity)
@@ -37,7 +37,7 @@ void push(int_array* arr, int value)
         }
 
         // reallocate memory for the array for the new capacity
-        arr->items = (int*)realloc(arr->items, arr->capacity * sizeof(*arr->items));
+        arr->items = (void*)realloc(arr->items, arr->capacity * sizeof(*arr->items));
     }
 
     // add the value to the array
@@ -50,7 +50,7 @@ void push(int_array* arr, int value)
  * @param arr The array to remove the value from
  * @return The value that was removed from the array
  */
-int* pop(int_array* arr)
+void* pop(dynamic_array* arr)
 {
     if (arr->count == 0)
     {
@@ -67,7 +67,7 @@ int* pop(int_array* arr)
  * @param index The index of the value to get
  * @return The value at the specified index
  */
-int* get(int_array* arr, unsigned int index)
+void* get(dynamic_array* arr, unsigned int index)
 {
     if (index >= arr->count)
     {
@@ -83,7 +83,7 @@ int* get(int_array* arr, unsigned int index)
  * @param arr The array to get the count of
  * @return The capacity of the array
  */
-size_t get_capacity(int_array* arr) { return arr->capacity; }
+size_t get_capacity(dynamic_array* arr) { return arr->capacity; }
 
 /**
  * Get current count of items inside the array
@@ -91,4 +91,4 @@ size_t get_capacity(int_array* arr) { return arr->capacity; }
  * @param arr The array to get the count of
  * @return The total count of items of the array
 */
-size_t get_count(int_array* arr) { return arr->count; }
+size_t get_count(dynamic_array* arr) { return arr->count; }

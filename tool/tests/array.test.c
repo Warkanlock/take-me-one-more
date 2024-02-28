@@ -3,21 +3,21 @@
 
 void check_create_array(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     TEST_ASSERT_NOT_NULL(array);
     release_array(array);
 }
 
 void check_push_null(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     TEST_ASSERT_NULL(array->items);
     release_array(array);
 }
 
 void check_get_capacity_after_push(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     push(array, 1);
     TEST_ASSERT_EQUAL(256, get_capacity(array));
     release_array(array);
@@ -25,7 +25,7 @@ void check_get_capacity_after_push(void)
 
 void check_get_count(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     push(array, 1);
     TEST_ASSERT_EQUAL(1, get_count(array));
     release_array(array);
@@ -33,14 +33,14 @@ void check_get_count(void)
 
 void check_get_capacity(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     TEST_ASSERT_EQUAL(0, get_capacity(array));
     release_array(array);
 }
 
 void check_get_after_push(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     push(array, 1);
     TEST_ASSERT_EQUAL(1, *get(array, 0));
     release_array(array);
@@ -48,7 +48,7 @@ void check_get_after_push(void)
 
 void check_push(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     push(array, 1);
     TEST_ASSERT_EQUAL(1, array->items[0]);
     release_array(array);
@@ -56,7 +56,7 @@ void check_push(void)
 
 void check_pop(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     push(array, 1);
     int* value = pop(array);
     TEST_ASSERT_EQUAL(1, *value);
@@ -65,7 +65,7 @@ void check_pop(void)
 
 void check_pop_by_reference(void)
 {
-    int_array* array = create_array();
+    dynamic_array* array = create_array();
     push(array, 1);
     int* value = pop(array);
     *value = 2;
