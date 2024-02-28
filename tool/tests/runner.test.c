@@ -24,6 +24,10 @@ extern void check_push(void);
 extern void check_pop(void);
 extern void check_pop_by_reference(void);
 extern void check_push_null(void);
+extern void check_get_capacity(void);
+extern void check_get_capacity_after_push(void);
+extern void check_get_after_push(void);
+extern void check_get_count(void);
 
 int main(void)
 {
@@ -44,6 +48,10 @@ int main(void)
     RUN_TEST(check_pop);
     RUN_TEST(check_pop_by_reference);
     RUN_TEST(check_push_null);
+    RUN_TEST(check_get_capacity);
+    RUN_TEST(check_get_capacity_after_push);
+    RUN_TEST(check_get_after_push);
+    RUN_TEST(check_get_count);
     UnityEnd();
 
     return 0;

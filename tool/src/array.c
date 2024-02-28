@@ -59,3 +59,36 @@ int* pop(int_array* arr)
 
     return &arr->items[--arr->count];
 }
+
+/**
+ * Get the value at the specified index
+ *
+ * @param arr The array to get the value from
+ * @param index The index of the value to get
+ * @return The value at the specified index
+ */
+int* get(int_array* arr, unsigned int index)
+{
+    if (index >= arr->count)
+    {
+        return NULL;
+    }
+
+    return &arr->items[index];
+}
+
+/**
+ * Get current capacity of the array
+ *
+ * @param arr The array to get the count of
+ * @return The capacity of the array
+ */
+size_t get_capacity(int_array* arr) { return arr->capacity; }
+
+/**
+ * Get current count of items inside the array
+ *
+ * @param arr The array to get the count of
+ * @return The total count of items of the array
+*/
+size_t get_count(int_array* arr) { return arr->count; }

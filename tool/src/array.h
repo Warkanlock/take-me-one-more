@@ -17,5 +17,8 @@ int_array* create_array();
 void release_array(int_array* arr);
 void push(int_array* arr, int value);
 int* pop(int_array* arr);
+int* get(int_array* arr, unsigned int index);
+size_t get_capacity(int_array* arr);
+size_t get_count(int_array* arr);
 
 #endif

@@ -15,6 +15,37 @@ void check_push_null(void)
     release_array(array);
 }
 
+void check_get_capacity_after_push(void)
+{
+    int_array* array = create_array();
+    push(array, 1);
+    TEST_ASSERT_EQUAL(256, get_capacity(array));
+    release_array(array);
+}
+
+void check_get_count(void)
+{
+    int_array* array = create_array();
+    push(array, 1);
+    TEST_ASSERT_EQUAL(1, get_count(array));
+    release_array(array);
+}
+
+void check_get_capacity(void)
+{
+    int_array* array = create_array();
+    TEST_ASSERT_EQUAL(0, get_capacity(array));
+    release_array(array);
+}
+
+void check_get_after_push(void)
+{
+    int_array* array = create_array();
+    push(array, 1);
+    TEST_ASSERT_EQUAL(1, *get(array, 0));
+    release_array(array);
+}
+
 void check_push(void)
 {
     int_array* array = create_array();
