@@ -31,6 +31,17 @@ extern void check_get_count(void);
 extern void check_simple_use_case(void);
 extern void check_simple_use_case_with_char(void);
 
+/** File tests */
+extern void test_cast_file_type(void);
+extern void test_get_parent_dir(void);
+extern void test_read_dir(void);
+extern void test_free_files_container(void);
+extern void test_create_directory(void);
+extern void test_get_inference_path(void);
+extern void test_extract_path_components(void);
+extern void test_validate_path(void);
+
+
 int main(void)
 {
     UnityBegin("tests/example.test.c");
@@ -56,6 +67,17 @@ int main(void)
     RUN_TEST(check_get_count);
     RUN_TEST(check_simple_use_case);
     RUN_TEST(check_simple_use_case_with_char);
+    UnityEnd();
+
+    UnityBegin("tests/file.test.c");
+    RUN_TEST(test_cast_file_type);
+    RUN_TEST(test_get_parent_dir);
+    RUN_TEST(test_read_dir);
+    RUN_TEST(test_free_files_container);
+    RUN_TEST(test_create_directory);
+    RUN_TEST(test_get_inference_path);
+    RUN_TEST(test_extract_path_components);
+    RUN_TEST(test_validate_path);
     UnityEnd();
 
     return 0;
