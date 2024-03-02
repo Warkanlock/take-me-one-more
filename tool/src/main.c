@@ -14,11 +14,11 @@
  */
 void supervisor(char* path)
 {
-    // prepare the difference file
+    // compute the difference file from inception directory
     FilesContainer files = read_dir(path, AVOID_DIRS);
     compute_difference(&files);
 
-    // use the difference file
+    // use the difference file to generate the corresponding original file from difference
     FilesContainer diff_files = read_dir(GLOBAL_DIFFERENCE_PATH, READ_DIRS);
     use_difference(&diff_files);
 
