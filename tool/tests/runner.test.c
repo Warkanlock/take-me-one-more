@@ -41,6 +41,14 @@ extern void test_get_inference_path(void);
 extern void test_extract_path_components(void);
 extern void test_validate_path(void);
 
+/** Beam tests */
+extern void test_process_image(void);
+extern void test_process_image_single(void);
+extern void test_create_image(void);
+extern void test_free_image(void);
+extern void test_process_difference(void);
+extern void test_store_difference(void);
+extern void test_read_difference(void);
 
 int main(void)
 {
@@ -78,6 +86,16 @@ int main(void)
     RUN_TEST(test_get_inference_path);
     RUN_TEST(test_extract_path_components);
     RUN_TEST(test_validate_path);
+    UnityEnd();
+
+    UnityBegin("tests/beam.test.c");
+    RUN_TEST(test_process_image);
+    RUN_TEST(test_process_image_single);
+    RUN_TEST(test_free_image);
+    RUN_TEST(test_create_image);
+    RUN_TEST(test_process_difference);
+    RUN_TEST(test_store_difference);
+    RUN_TEST(test_read_difference);
     UnityEnd();
 
     return 0;
