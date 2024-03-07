@@ -42,7 +42,7 @@ test: $(TEST_OBJS) $(OBJS_WITHOUT_MAIN)
 
 # Target for cleaning up the build
 clean:
-	rm -rf $(OUTDIR)/* $(OBJDIR) $(TARGET)/*.o $(TEST_DIR)/*.o
+	rm -rf $(OUTDIR)/* $(OBJDIR) $(TARGET)/*.o $(TEST_DIR)/*.o .inference
 
 debug: compile  # Target for debugging the main application
 	lldb $(SOURCE_TARGET) # Use lldb to debug the main application

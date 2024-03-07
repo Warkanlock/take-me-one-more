@@ -99,7 +99,6 @@ char* get_parent_dir(const char* path)
     return cwd;
 }
 
-
 /**
  * @brief This function reads a directory
  *
@@ -186,7 +185,6 @@ FilesContainer read_dir(char* path, bool avoid_dirs)
     return files_array;
 }
 
-
 /**
  * @brief This function gets the directory in charge of tracking the differences
  *
@@ -198,13 +196,13 @@ FilesContainer read_dir(char* path, bool avoid_dirs)
  *
  * @return char* The directory in charge of tracking the differences
  */
-char* get_inference_path(char* file_path, bool create_path)
+char* get_inference_path(char* file_path, bool create_path, int index)
 {
     char* directory = (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
     char* full_path = (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
 
     sprintf(directory, "%s/%s", GLOBAL_DIFFERENCE_PATH, file_path);
-    sprintf(full_path, "%s/%s.%s", directory, GLOBAL_DIFFERENCE_FILE_NAME, GLOBAL_DIFFERENCE_FILE_EXTENSION);
+    sprintf(full_path, "%s/%s_%d.%s", directory, GLOBAL_DIFFERENCE_FILE_NAME, index, GLOBAL_DIFFERENCE_FILE_EXTENSION);
 
     // create directory if any child does not exists yet
     if (create_path)
@@ -246,7 +244,6 @@ char* extract_path_components(const char* path)
     }
 }
 
-
 /**
  * @brief This function validates the path
  *
@@ -263,26 +260,21 @@ char* validate_path(const char* path)
         throw_error("No path was provided. Please provide one\n");
     }
 
-    // check path was a valid directory
-    DIR* dir = opendir(path);
-
-    if (dir)
+    if ((opendir(path)) != NULL)
     {
-        closedir(dir);
+        // continue since the path exists in the first place
     }
     else
     {
         throw_error("Could not open directory. Please verify the path");
     }
 
-    // canonicalize the path
     char* canonical_path = realpath(path, NULL);
-
     if (canonical_path == NULL)
     {
         throw_error("Could not canonicalize the path. Please verify the path");
     }
 
-    // cast `const path` to `char*` and return it
+    // Return the canonical_path directly
     return (char*)path;
 }

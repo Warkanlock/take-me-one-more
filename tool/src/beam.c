@@ -152,11 +152,14 @@ PixelImage* process_difference(PixelImage* base, PixelImage* current)
  * @param index The index of the difference
  * @return void
  */
-void store_difference(PixelImage* difference, File* inception_file)
+void store_difference(PixelImage* difference, File* inception_file, unsigned int index_diff)
 {
     // create if required path to store the difference
     bool create_path = true;
-    char* full_path = get_inference_path(inception_file->path, create_path);
+
+    char* full_path = get_inference_path(inception_file->path, create_path, index_diff);
+
+    printf("Saving difference at: %s\n", full_path);
 
     // open path at full_path
     FILE* file = fopen(full_path, "wb");
@@ -346,17 +349,38 @@ void compute_difference(FilesContainer* files)
         {
             printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
 
+            // print image metadata
+            printf("Image\t[Metadata]: width: %d, height: %d, max_color: %d \n", image->width, image->height,
+                   image->max_color);
+
             // process difference between inception + image
             PixelImage* diff = process_difference(inception, image);
 
-            // TODO: assess threshold to understand if another inception layer
-            // should be created
+            // assess threshold to understand if another inception layer
+            if (diff->width != inception->width || diff->height != inception->height)
+            {
+                // TODO: this should not work for same images but completely different content
+                printf("The width or height of the image is different. \n");
+                printf("Using new inception \n");
+
+                // free the memory
+                free_image(inception);
+                free_image(image);
+                free_image(diff);
+
+                // reset the inception
+                inception = NULL;
+                inception_file = NULL;
+
+                // start again from the beginning with a new inception
+                continue;
+            }
 
             // store the difference in a binary file already created
             // this diff.dat will be store in .inferece/{path_dir}/diff.data
             // and this binary will contain all the differences computed across
             // the inception frame
-            store_difference(diff, inception_file);
+            store_difference(diff, inception_file, i);
 
             free_image(diff);
         }

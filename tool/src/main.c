@@ -1,6 +1,6 @@
+#include "beam.h"
 #include "error.h"
 #include "file.h"
-#include "beam.h"
 #include "global.h"
 
 /**
