@@ -198,8 +198,9 @@ FilesContainer read_dir(char* path, bool avoid_dirs)
  */
 char* get_inference_path(char* file_path, bool create_path, int index)
 {
-    char* directory = (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
-    char* full_path = (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path));
+    char* directory = (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path) + 1);
+    char* full_path = (char*)malloc(strlen(GLOBAL_DIFFERENCE_PATH) + strlen(file_path) +
+                                    strlen(GLOBAL_DIFFERENCE_FILE_NAME) + strlen(GLOBAL_DIFFERENCE_FILE_EXTENSION) + 3);
 
     sprintf(directory, "%s/%s", GLOBAL_DIFFERENCE_PATH, file_path);
     sprintf(full_path, "%s/%s_%d.%s", directory, GLOBAL_DIFFERENCE_FILE_NAME, index, GLOBAL_DIFFERENCE_FILE_EXTENSION);
@@ -207,6 +208,7 @@ char* get_inference_path(char* file_path, bool create_path, int index)
     // create directory if any child does not exists yet
     if (create_path)
     {
+        printf("%s\n", directory);
         create_directory(directory);
     }
 

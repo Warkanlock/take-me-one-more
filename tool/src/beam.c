@@ -349,17 +349,12 @@ void compute_difference(FilesContainer* files)
         {
             printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
 
-            // print image metadata
-            printf("Image\t[Metadata]: width: %d, height: %d, max_color: %d \n", image->width, image->height,
-                   image->max_color);
-
             // process difference between inception + image
             PixelImage* diff = process_difference(inception, image);
 
             // assess threshold to understand if another inception layer
-            if (diff->width != inception->width || diff->height != inception->height)
+            if (image->width != inception->width && image->height != inception->height)
             {
-                // TODO: this should not work for same images but completely different content
                 printf("The width or height of the image is different. \n");
                 printf("Using new inception \n");
 
