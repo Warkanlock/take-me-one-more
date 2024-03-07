@@ -347,6 +347,10 @@ void compute_difference(FilesContainer* files)
         }
         else
         {
+            // TODO:
+            // 1. we should process inception + beams frames individually
+            // 2. each inferece should be stored in a different folder under the name of the original
+            // 3. we should be able to recover the original image from the inferece + inception
             printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
 
             // process difference between inception + image
