@@ -22,7 +22,7 @@ typedef struct
 /** Image treatment */
 PixelImage* process_image(char* path);
 PixelImage* create_image(unsigned int width, unsigned int height, unsigned int color_depth);
-void free_image(PixelImage* img);
+void free_image(PixelImage** img);
 
 /** Difference mechanism */
 PixelImage* process_difference(PixelImage* base, PixelImage* current);

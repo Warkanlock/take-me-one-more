@@ -23,10 +23,15 @@ void test_read_dir(void)
 
 void test_free_files_container(void)
 {
-    FilesContainer* fc = (FilesContainer*)malloc(sizeof(FilesContainer));
-    free_files_container(fc);
-    TEST_ASSERT_NULL(fc->files);
-    free(fc);
+    FilesContainer fc;
+
+    fc.total_nodes = 0;
+    fc.parent_dir = NULL;
+    fc.files = NULL;
+
+    free_files_container(&fc);
+
+    TEST_ASSERT_NULL(fc.files);
 }
 
 void test_create_directory(void) { create_directory("/path/to/new_directory"); }

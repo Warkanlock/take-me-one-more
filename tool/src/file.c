@@ -40,9 +40,20 @@ void create_directory(const char* path)
  */
 void free_files_container(FilesContainer* files_container)
 {
-    for (int i = 0; i < files_container->total_nodes; i++)
+    if (files_container == NULL)
     {
-        free(files_container->files[i].path);
+        return;
+    }
+
+    if (files_container->total_nodes > 0)
+    {
+        for (int i = 0; i < files_container->total_nodes; i++)
+        {
+            if (files_container->files[i].path != NULL)
+            {
+                free(files_container->files[i].path);
+            }
+        }
     }
 
     free(files_container->files);

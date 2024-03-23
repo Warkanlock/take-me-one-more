@@ -98,15 +98,18 @@ PixelImage* create_image(unsigned int width, unsigned int height, unsigned int c
  * @param img The image to free
  * @return void
  */
-void free_image(PixelImage* img)
+void free_image(PixelImage** img)
 {
-    for (int i = 0; i < img->height; i++)
+    // free double pointer
+    for (int i = 0; i < (*img)->height; i++)
     {
-        free(img->pixels[i]);
+        free((*img)->pixels[i]);
+        (*img)->pixels[i] = NULL;
     }
 
-    free(img->pixels);
-    free(img);
+    // free image
+    free(*img);
+    *img = NULL;
 }
 
 /**
@@ -298,7 +301,7 @@ void use_difference(FilesContainer* inception_container)
         // TODO: we should store again the file from scratch with the difference in mind
 
         // once we have the difference, we should store it
-        free_image(image);
+        free_image(&image);
     }
 }
 
@@ -382,10 +385,10 @@ void compute_difference(FilesContainer* files)
             // the inception frame
             store_difference(diff, inception_file, file.name);
 
-            free_image(diff);
+            free_image(&diff);
         }
 
         // once we have the image, we should free the memory
-        free_image(image);
+        free_image(&image);
     }
 }

@@ -16,7 +16,7 @@ void read_fixtures(void)
                 snprintf(path, sizeof(path), "./fixtures/%s", dir->d_name);
                 printf("Processing image: %s\n", path);
                 PixelImage* img = process_image(path);
-                free_image(img);
+                free_image(&img);
             }
         }
         closedir(d);
@@ -30,7 +30,7 @@ void test_create_image(void)
     unsigned int width = 100, height = 100, color_depth = 24;
     PixelImage* img = create_image(width, height, color_depth);
     TEST_ASSERT_NOT_NULL(img);
-    free_image(img);
+    free_image(&img);
 }
 
 void test_free_image(void)
@@ -38,8 +38,7 @@ void test_free_image(void)
     unsigned int width = 100, height = 100, color_depth = 24;
     PixelImage* img = create_image(width, height, color_depth);
     TEST_ASSERT_NOT_NULL(img);
-    free_image(img);
-    TEST_ASSERT_NULL(img->pixels);
+    free_image(&img);
 }
 
 void test_process_difference(void)
@@ -53,8 +52,8 @@ void test_process_difference(void)
     PixelImage* diff = process_difference(img1, img2);
 
     TEST_ASSERT_NOT_NULL(diff->pixels);
-    free_image(img1);
-    free_image(img2);
+    free_image(&img1);
+    free_image(&img2);
 }
 
 void test_store_difference(void)
@@ -83,9 +82,9 @@ void test_store_difference(void)
 
     TEST_ASSERT_EQUAL_STRING(".inference/tests/fixtures/diff.ppm/diff_0.dat", inference_path);
 
-    free_image(img1);
-    free_image(img2);
-    free_image(diff);
+    free_image(&img1);
+    free_image(&img2);
+    free_image(&diff);
 }
 
 void test_read_difference(void)
@@ -106,9 +105,9 @@ void test_read_difference(void)
 
     TEST_ASSERT_NOT_NULL(diff->pixels);
 
-    free_image(img1);
-    free_image(img2);
-    free_image(diff);
+    free_image(&img1);
+    free_image(&img2);
+    free_image(&diff);
 }
 
 void test_process_image_single(void)

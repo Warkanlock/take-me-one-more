@@ -3,16 +3,20 @@
 /**
  * Create a new dynamic array for integers
  */
-dynamic_array* create_array() { return (dynamic_array*)malloc(sizeof(dynamic_array)); }
+dynamic_array* create_array() {
+    dynamic_array *array = (dynamic_array*)malloc(sizeof(dynamic_array));
+
+    array->items = NULL;
+    array->capacity = 0;
+    array->count = 0;
+
+    return array;
+}
 
 /**
  * Free the memory used by the array
  */
-void release_array(dynamic_array* arr)
-{
-    free(arr->items);
-    free(arr);
-}
+void release_array(dynamic_array* arr) { free(arr->items); }
 
 /**
  * Add a value to the array
