@@ -76,10 +76,10 @@ void test_store_difference(void)
     file.path = output_path;
     file.type = DT_REG;
 
-    int index_diff = 0;
+    char* index_name = "diff_0";
 
-    store_difference(diff, &file, index_diff);
-    char* inference_path = get_inference_path(output_path, false, index_diff);
+    store_difference(diff, &file, index_name);
+    char* inference_path = get_inference_path(output_path, false, index_name);
 
     TEST_ASSERT_EQUAL_STRING(".inference/tests/fixtures/diff.ppm/diff_0.dat", inference_path);
 

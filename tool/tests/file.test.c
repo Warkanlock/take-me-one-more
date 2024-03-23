@@ -33,7 +33,7 @@ void test_create_directory(void) { create_directory("/path/to/new_directory"); }
 
 void test_get_inference_path(void)
 {
-    char* path = get_inference_path("/path/to/file", true, 0);
+    char* path = get_inference_path("/path/to/file", true, "index");
     TEST_ASSERT_NOT_NULL(path);
     free(path);
 }

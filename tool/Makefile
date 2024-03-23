@@ -40,6 +40,10 @@ test: $(TEST_OBJS) $(OBJS_WITHOUT_MAIN)
 	$(CC) -o $(TEST_TARGET) $^ $(CFLAGS) $(UNITY)/unity.c
 	./$(TEST_TARGET)
 
+# Target for cleaning up the build except for the .inference file
+cleandist:
+	rm -rf $(OUTDIR)/* $(OBJDIR) $(TARGET)/*.o $(TEST_DIR)/*.o
+
 # Target for cleaning up the build
 clean:
 	rm -rf $(OUTDIR)/* $(OBJDIR) $(TARGET)/*.o $(TEST_DIR)/*.o .inference

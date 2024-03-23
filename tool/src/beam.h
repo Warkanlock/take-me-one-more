@@ -26,7 +26,7 @@ void free_image(PixelImage* img);
 
 /** Difference mechanism */
 PixelImage* process_difference(PixelImage* base, PixelImage* current);
-void store_difference(PixelImage* difference, File* inception_file, unsigned int index_diff);
+void store_difference(PixelImage* difference, File* inception_file, char* index_diff);
 void read_difference(char* diff_path, PixelImage* difference, int index_diff);
 void use_difference(FilesContainer* inception_container);
 void compute_difference(FilesContainer* files);

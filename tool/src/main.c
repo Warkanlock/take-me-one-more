@@ -3,6 +3,9 @@
 #include "file.h"
 #include "global.h"
 
+#define ENABLE_DIFFERENCE 1
+#define ENABLE_USE_DIFFERENCE 1
+
 /**
  * @brief This function is in charge of listening to a directory
  *
@@ -14,16 +17,19 @@
  */
 void supervisor(char* path)
 {
-    // compute the difference file from inception directory
+    // compute the difference file from inception director
+#if ENABLE_DIFFERENCE
     FilesContainer files = read_dir(path, AVOID_DIRS);
     compute_difference(&files);
+    free_files_container(&files);
+#endif
 
     // use the difference file to generate the corresponding original file from difference
+#if ENABLE_USE_DIFFERENCE
     FilesContainer diff_files = read_dir(GLOBAL_DIFFERENCE_PATH, READ_DIRS);
     use_difference(&diff_files);
-
-    // free memory used
-    free_files_container(&files);
+    free_files_container(&diff_files);
+#endif
 }
 
 int main(int argc, char* argv[])

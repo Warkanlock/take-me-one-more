@@ -149,17 +149,17 @@ PixelImage* process_difference(PixelImage* base, PixelImage* current)
  *
  * @param difference The difference between images
  * @param inception_file The file to store the difference
- * @param index The index of the difference
+ * @param index_name The name of the difference
  * @return void
  */
-void store_difference(PixelImage* difference, File* inception_file, unsigned int index_diff)
+void store_difference(PixelImage* difference, File* inception_file, char* index_name)
 {
     // create if required path to store the difference
     bool create_path = true;
 
-    char* full_path = get_inference_path(inception_file->path, create_path, index_diff);
+    char* full_path = get_inference_path(inception_file->path, create_path, index_name);
 
-    printf("Saving difference at: %s\n", full_path);
+    printf("Saving difference at: %s [for %s]\n", full_path, inception_file->name);
 
     // open path at full_path
     FILE* file = fopen(full_path, "wb");
@@ -295,6 +295,8 @@ void use_difference(FilesContainer* inception_container)
             }
         }
 
+        // TODO: we should store again the file from scratch with the difference in mind
+
         // once we have the difference, we should store it
         free_image(image);
     }
@@ -347,39 +349,38 @@ void compute_difference(FilesContainer* files)
         }
         else
         {
-            // TODO:
-            // 1. we should process inception + beams frames individually
-            // 2. each inferece should be stored in a different folder under the name of the original
-            // 3. we should be able to recover the original image from the inferece + inception
-            printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
-
-            // process difference between inception + image
-            PixelImage* diff = process_difference(inception, image);
-
             // assess threshold to understand if another inception layer
             if (image->width != inception->width && image->height != inception->height)
             {
-                printf("The width or height of the image is different. \n");
-                printf("Using new inception \n");
+                printf("New inception detected. Switching [%s]<with>[%s]. \n", inception_file->name,
+                       files->files[i].name);
+                printf("Root\t[Inception]: %s (%s) \n", files->files[i].name, files->files[i].path);
 
-                // free the memory
-                free_image(inception);
-                free_image(image);
-                free_image(diff);
+                // read the first image and store it as the inception
+                inception = process_image(files->files[i].path);
 
-                // reset the inception
-                inception = NULL;
-                inception_file = NULL;
+                // store the file as the inception file
+                inception_file = &files->files[i];
 
-                // start again from the beginning with a new inception
+                // iterate again to compute next beam
                 continue;
             }
+            else
+            {
+                // 1. we should process inception + beams frames individually
+                // 2. each inferece should be stored in a different folder under the name of the original
+                // 3. we should be able to recover the original image from the inferece + inception
+                printf("File\t[%s]: %s (%s) \n", cast_file_type(file.type), file.name, file.path);
+            }
+
+            // process difference between inception + image
+            PixelImage* diff = process_difference(inception, image);
 
             // store the difference in a binary file already created
             // this diff.dat will be store in .inferece/{path_dir}/diff.data
             // and this binary will contain all the differences computed across
             // the inception frame
-            store_difference(diff, inception_file, i);
+            store_difference(diff, inception_file, file.name);
 
             free_image(diff);
         }
