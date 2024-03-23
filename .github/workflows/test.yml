@@ -2,18 +2,18 @@ name: CI Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build:
-    working-directory: ./tool
+  testing:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./tool
 
     steps:
-    - uses: actions/checkout@v3
-    - name: make
-      run: make
-    - name: testing suite
-      run: make test
+      - uses: actions/checkout@v3
+      - name: Run testing suite
+        run: make test
