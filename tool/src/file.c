@@ -40,11 +40,6 @@ void create_directory(const char* path)
  */
 void free_files_container(FilesContainer* files_container)
 {
-    if (files_container == NULL)
-    {
-        return;
-    }
-
     if (files_container->total_nodes > 0)
     {
         for (int i = 0; i < files_container->total_nodes; i++)
@@ -52,14 +47,17 @@ void free_files_container(FilesContainer* files_container)
             if (files_container->files[i].path != NULL)
             {
                 free(files_container->files[i].path);
+                files_container->files[i].path = NULL;
             }
         }
     }
 
     free(files_container->files);
+    files_container->files = NULL;
 
     // deallocate the parent directory when is not needed
     free(files_container->parent_dir);
+    files_container->parent_dir = NULL;
 }
 
 /**
