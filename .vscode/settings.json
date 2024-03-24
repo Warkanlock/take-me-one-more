@@ -1,3 +1,11 @@
 {
-  "cmake.configureOnOpen": true
+  "cmake.configureOnOpen": true,
+  "makefile.makefilePath": "/Users/txxnano/Warkanlock/interframe-supervisor/tool/",
+  "makefile.launchConfigurations": [
+    {
+      "cwd": "/Users/txxnano/Warkanlock/interframe-supervisor/dist",
+      "binaryPath": "/Users/txxnano/Warkanlock/interframe-supervisor/dist/interframe",
+      "binaryArgs": []
+    }
+  ]
 }
